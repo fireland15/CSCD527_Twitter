@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TweetPreprocessor")]
+[assembly: AssemblyTitle("Test.StreamProcessor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TweetPreprocessor")]
+[assembly: AssemblyProduct("Test.StreamProcessor")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f1e0684f-253a-4ad5-b803-32be6f63c8c0")]
+[assembly: Guid("395bc250-7bc2-4f13-ae2d-6490f38728cc")]
 
 // Version information for an assembly consists of the following four values:
 //

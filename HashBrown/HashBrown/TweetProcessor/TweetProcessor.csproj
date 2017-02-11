@@ -4,19 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F1E0684F-253A-4AD5-B803-32BE6F63C8C0}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{B94F94F9-D446-4866-BBE1-490F5F1807F8}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TweetPreprocessor</RootNamespace>
-    <AssemblyName>TweetPreprocessor</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>TweetProcessor</RootNamespace>
+    <AssemblyName>TweetProcessor</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -79,11 +76,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="IHashPairGenerator.cs" />
+    <Compile Include="ITweetFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{058821b0-1615-4a9e-9d0e-396f3cb7b231}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TweetTrim\TweetTrim.csproj">
+      <Project>{dd164ec7-ccc5-4dde-940e-07b27db6e4be}</Project>
+      <Name>TweetTrim</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
