@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ITweetTrim.cs" />
+    <Compile Include="Interfaces\ITweetTrim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TweetTrim.cs" />
   </ItemGroup>
