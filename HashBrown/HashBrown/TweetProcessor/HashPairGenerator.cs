@@ -7,7 +7,7 @@ using Shared;
 
 namespace TweetProcessor
 {
-    class HashPairGenerator : IHashPairGenerator
+    public class HashPairGenerator : IHashPairGenerator
     {
         public ICollection<WordHashtagPair> GenerateHashPairs(Tweeter tweet)
         {

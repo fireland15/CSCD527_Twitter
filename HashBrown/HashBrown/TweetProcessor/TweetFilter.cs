@@ -4,7 +4,7 @@ using Tweetinvi.Models;
 
 namespace TweetProcessor
 {
-    class TweetFilter : ITweetFilter
+    public class TweetFilter : ITweetFilter
     {
         public Tweeter FilterTweet(ITweet tweet)
         {

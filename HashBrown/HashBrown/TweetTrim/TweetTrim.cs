@@ -8,7 +8,8 @@ namespace TweetTrim
     {
         public Tweeter Trim(Tweeter tweeter)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return tweeter;
         }
 
         private ICollection<string> Remove(ICollection<string> wordsToRemove, IEnumerable<string> wordSet)
