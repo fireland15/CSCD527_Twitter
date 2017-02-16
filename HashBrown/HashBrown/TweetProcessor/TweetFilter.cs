@@ -15,11 +15,11 @@ namespace TweetProcessor
             { return null; }
 
             List<IHashtagEntity> hashTags = tweet.Hashtags;
-            if (hashTags == null)
+            if (hashTags.Count == 0)
             { return null; }
 
             List<IUrlEntity> urls = tweet.Urls;
-            if (urls != null)
+            if (urls.Count > 0)
             { return null; }
 
             //need to figureout what the difference is between text and full text
