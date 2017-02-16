@@ -11,7 +11,7 @@ namespace TweetProcessor
         public Tweeter FilterTweet(ITweet tweet)
         {
             ITweetEntities media = tweet.Entities;
-            if(media != null)
+            if(media.Medias.Count != 0)
             { return null; }
 
             List<IHashtagEntity> hashTags = tweet.Hashtags;

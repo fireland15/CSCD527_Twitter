@@ -23,6 +23,10 @@ namespace StreamProcessor
 
         private readonly IHashPairGenerator _hashPairGenerator;
 
+        private DateTime _startOn;
+
+        private DateTime _stopOn;
+
         private Thread _streamThread;
 
         public uint TweetsReceived { get; set; } = 0;
@@ -30,6 +34,8 @@ namespace StreamProcessor
         public uint TweetsAccepted { get; set; } = 0;
 
         public uint WordHashtagPairsStored { get; set; } = 0;
+
+        public uint TweetThroughput => TweetsReceived / (uint)(_stopOn.Subtract(_startOn).Seconds);
 
         public TwitterStreamProcessor(ITwitterCredentials credentials, ITweetFilter tweetFilter, ITweetTrim tweetTrimmer, IHashPairGenerator hashPairGenerator)
         {
@@ -51,6 +57,7 @@ namespace StreamProcessor
                 _stream.StartStream();
             });
 
+            _startOn = DateTime.Now;
             _streamThread.Start();
         }
 
@@ -62,6 +69,7 @@ namespace StreamProcessor
             {
                 /* Wait for stream to stop */
             }
+            _stopOn = DateTime.Now;
             return "Stream stopped";
         }
 
@@ -91,10 +99,10 @@ namespace StreamProcessor
             }
 
             Tweeter trimmedTweeter = _tweetTrimmer.Trim(tweeter);
-            if (!trimmedTweeter.IsValid())
-            {
-                return;
-            }
+            //if (!trimmedTweeter.IsValid())
+            //{
+            //    return;
+            //}
 
             TweetsAccepted++;
 

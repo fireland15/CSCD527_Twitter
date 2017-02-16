@@ -30,7 +30,7 @@ namespace StreamProcessor
             TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator);
 
             streamProcessor.Start();
-
+            
             while (true)
             {
                 string s = Console.ReadLine();
@@ -40,8 +40,9 @@ namespace StreamProcessor
                 }
             }
 
-            streamProcessor.Stop();
+            Console.WriteLine(streamProcessor.Stop());
 
+            Console.WriteLine($"Average Tweet throughput {streamProcessor.TweetThroughput} tweets/s.");
             Console.WriteLine($"Received {streamProcessor.TweetsReceived} tweets.");
             Console.WriteLine($"Accepted {streamProcessor.TweetsAccepted} tweets.");
             Console.WriteLine($"Stored {streamProcessor.WordHashtagPairsStored} word-hashtag pairs.");
