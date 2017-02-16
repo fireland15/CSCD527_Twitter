@@ -30,12 +30,33 @@ namespace StreamProcessor
             TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator);
 
             streamProcessor.Start();
-            
+
+            bool stopMonitoring = false;
+
+            var t = new Thread(() =>
+            {
+                while (!stopMonitoring)
+                {
+                    try
+                    {
+                        Console.WriteLine($"Receiving {streamProcessor.TweetsAccepted} tweets/s.");
+                    }
+                    catch (DivideByZeroException)
+                    {
+                        /* Do nothing */
+                    }
+                    Thread.Sleep(1000);
+                }
+            });
+
+            t.Start();
+
             while (true)
             {
                 string s = Console.ReadLine();
                 if (s == "q" || s == "quit")
                 {
+                    stopMonitoring = true;
                     break;
                 }
             }

@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Tweetinvi.Models.Entities;
 
 namespace Shared
 {
     public class Tweeter
     {
-        private object WordSet1;
-        private object HashTagSet;
-
-        public Tweeter(object wordSet, object hashTagSet)
+        public Tweeter(string text, ICollection<IHashtagEntity> hashTagSet)
         {
-            this.WordSet = WordSet;
-            this.HashTagSet = hashTagSet;
+            WordSet = SplitText(text);
+            HashtagSet = hashTagSet.Select(h => h.Text).ToList();
         }
 
         public ICollection<string> WordSet { get; set; }
@@ -19,6 +18,20 @@ namespace Shared
         public bool IsValid()
         {
             return !(WordSet.Count == 0 || HashtagSet.Count == 0);
+        }
+
+        /// <summary>
+        /// Splits a text string on the following characters
+        /// whitespace.,/!@$%^&*()\\:;\"'<>?
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private ICollection<string> SplitText(string text)
+        {
+            return text.Split(" .,/!@$%^&*()\\:;\"'<>?".ToCharArray())
+                .Where(s => s.Length != 0)
+                .Select(s => s.ToLower())
+                .ToList();
         }
     }
 }

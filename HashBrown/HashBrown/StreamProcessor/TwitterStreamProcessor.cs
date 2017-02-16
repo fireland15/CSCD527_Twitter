@@ -29,13 +29,17 @@ namespace StreamProcessor
 
         private Thread _streamThread;
 
-        public uint TweetsReceived { get; set; } = 0;
+        public uint TweetsReceived { get; set; }
 
-        public uint TweetsAccepted { get; set; } = 0;
+        public uint TweetsAccepted { get; set; }
 
-        public uint WordHashtagPairsStored { get; set; } = 0;
+        public uint WordHashtagPairsStored { get; set; }
 
-        public uint TweetThroughput => TweetsReceived / (uint)(_stopOn.Subtract(_startOn).Seconds);
+        public int MilliSecondsRunning => DateTime.Now.Subtract(_startOn).Milliseconds;
+
+        public uint AverageTweetThroughput => TweetsReceived / (uint)(_stopOn.Subtract(_startOn).TotalSeconds);
+
+        public uint TweetThroughput => TweetsReceived / (uint)DateTime.Now.Subtract(_startOn).TotalSeconds;
 
         public TwitterStreamProcessor(ITwitterCredentials credentials, ITweetFilter tweetFilter, ITweetTrim tweetTrimmer, IHashPairGenerator hashPairGenerator)
         {
