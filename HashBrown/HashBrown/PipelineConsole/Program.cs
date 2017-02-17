@@ -12,8 +12,18 @@ namespace PipelineConsole
             Console.WriteLine();
             Console.WriteLine("Enter sql commands for pipelinedb");
             Console.WriteLine();
-            Console.WriteLine("type 'quit' when you are finished to close the connection");
+            Console.WriteLine("COMMANDS");
+            Console.WriteLine("\texec  - Allows you to enter a sql statement that doesn't return stuff");
+            Console.WriteLine("\tquery - Allows you to query for results");
+            Console.WriteLine("\tquit  - Closes the connection and terminates program");
             Console.WriteLine("=========================================================");
+            Console.WriteLine("EXAMPLE\n");
+            Console.WriteLine(">exec");
+            Console.WriteLine("CREATE STREAM stream_name (x integer, y integer, z integer);");
+            Console.WriteLine(">query");
+            Console.WriteLine("SELECT * FROM continuous_view_name WHERE x = 1;");
+            Console.WriteLine("=========================================================");
+
         }
 
         static void Main(string[] args)

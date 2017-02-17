@@ -37,21 +37,46 @@ namespace PipelineConsole
                 {
                     break;
                 }
-
-                NpgsqlCommand sqlCommand = new NpgsqlCommand(command, _connection);
-
-                try
+                else if (command.Equals("query", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    NpgsqlDataReader rdr = sqlCommand.ExecuteReader();
-
-                    while (rdr.Read())
+                    string sql = Console.ReadLine();
+                    using (NpgsqlCommand sqlCommand = new NpgsqlCommand(sql, _connection))
                     {
-                        Console.WriteLine(rdr.ToString());
+
+                        try
+                        {
+                            using (NpgsqlDataReader rdr = sqlCommand.ExecuteReader())
+                            {
+
+                                while (rdr.Read())
+                                {
+                                    for (int i = 0; i < rdr.FieldCount; i++)
+                                    {
+                                        Console.WriteLine(rdr[i]);
+                                    }
+                                }
+                            }
+                        }
+                        catch (NpgsqlException ex)
+                        {
+                            Console.WriteLine($"Exception Encountered: {ex.Message}");
+                        }
                     }
                 }
-                catch (NpgsqlException ex)
+                else if (command.Equals("exec", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    Console.WriteLine($"Exception Encountered: {ex.Message}");
+                    string sql = Console.ReadLine();
+                    using (NpgsqlCommand sqlCommand = new NpgsqlCommand(sql, _connection))
+                    {
+                        try
+                        {
+                            sqlCommand.ExecuteNonQuery();
+                        }
+                        catch (NpgsqlException ex)
+                        {
+                            Console.WriteLine($"Exception Encountered: {ex.Message}");
+                        }
+                    }
                 }
             }
 
