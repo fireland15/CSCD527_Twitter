@@ -7,6 +7,8 @@ namespace Shared
         private object WordSet1;
         private object HashTagSet;
 
+        public Tweeter() { }
+
         public Tweeter(object wordSet, object hashTagSet)
         {
             this.WordSet = WordSet;
