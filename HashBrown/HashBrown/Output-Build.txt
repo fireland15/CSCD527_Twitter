@@ -1,0 +1,8 @@
+﻿1>------ Clean started: Project: Test.TweetProcessor, Configuration: Debug Any CPU ------
+2>------ Clean started: Project: Test.StreamProcessor, Configuration: Debug Any CPU ------
+3>------ Clean started: Project: StreamProcessor, Configuration: Debug Any CPU ------
+4>------ Clean started: Project: TweetProcessor, Configuration: Debug Any CPU ------
+5>------ Clean started: Project: Test.TweetTrim, Configuration: Debug Any CPU ------
+6>------ Clean started: Project: TweetTrim, Configuration: Debug Any CPU ------
+7>------ Clean started: Project: Shared, Configuration: Debug Any CPU ------
+========== Clean: 7 succeeded, 0 failed, 0 skipped ==========

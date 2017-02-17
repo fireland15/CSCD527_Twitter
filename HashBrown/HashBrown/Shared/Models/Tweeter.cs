@@ -6,6 +6,11 @@ namespace Shared
 {
     public class Tweeter
     {
+		public Tweeter()
+		{
+			
+		}
+		
         public Tweeter(string text, ICollection<IHashtagEntity> hashTagSet)
         {
             WordSet = SplitText(text);

@@ -40,9 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TweetTrim.cs" />
     <Compile Include="Interfaces\ITweetTrim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TweetTrim.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj">
