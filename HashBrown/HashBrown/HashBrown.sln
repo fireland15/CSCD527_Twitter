@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.StreamProcessor", "Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.TweetProcessor", "Test.TweetProcessor\Test.TweetProcessor.csproj", "{F14EE94D-902E-4A11-A41A-18162269C8E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineConsole", "PipelineConsole\PipelineConsole.csproj", "{5F306D84-B91C-4AE2-A7F0-9AA0EBED48C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{F14EE94D-902E-4A11-A41A-18162269C8E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F14EE94D-902E-4A11-A41A-18162269C8E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F14EE94D-902E-4A11-A41A-18162269C8E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F306D84-B91C-4AE2-A7F0-9AA0EBED48C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F306D84-B91C-4AE2-A7F0-9AA0EBED48C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F306D84-B91C-4AE2-A7F0-9AA0EBED48C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F306D84-B91C-4AE2-A7F0-9AA0EBED48C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
