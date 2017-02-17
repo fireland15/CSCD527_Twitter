@@ -13,6 +13,7 @@ namespace PipelineConsole
             Console.WriteLine("Enter sql commands for pipelinedb");
             Console.WriteLine();
             Console.WriteLine("type 'quit' when you are finished to close the connection");
+            Console.WriteLine("=========================================================");
         }
 
         static void Main(string[] args)
@@ -23,7 +24,11 @@ namespace PipelineConsole
 
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {
+                Console.WriteLine("Connecting...\n");
+
                 con.Open();
+
+                Console.WriteLine("Connection ready.\n");
                 
                 PipelineCommander commander = new PipelineCommander(con);
 
