@@ -19,13 +19,12 @@ namespace StreamProcessor
             string consumerSecret = config.AppSettings.Settings["ConsumerSecret"].Value;
             string apiToken = config.AppSettings.Settings["ApiToken"].Value;
             string apiTokenSecret = config.AppSettings.Settings["ApiTokenSecret"].Value;
+            string stopWordFileName = config.AppSettings.Settings["StopWordFile"].Value;
             Credentials = Auth.CreateCredentials(consumerKey, consumerSecret, apiToken, apiTokenSecret);
 
             ITweetFilter tweetFilter = new TweetFilter();
-            ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim();
+            ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim(stopWordFileName);
             IHashPairGenerator pairGenerator = new HashPairGenerator();
-
-
 
             TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator);
 

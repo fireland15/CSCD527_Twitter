@@ -9,33 +9,35 @@ namespace TweetTrim
     public class TweetTrim : ITweetTrim
     {
 
-        public TweetTrim()
+        public TweetTrim(string stopListFileName)
         {
             //TODO: read in the stopList file as an IEnum 
-            StopList = CreateStopList();
+            StopList = CreateStopList(stopListFileName);
             //TODO: make a list of valid words to test that words are good.
             ValidWords = null;
-        }//end of builder
+        }
 
         public IEnumerable<string> StopList { set; get; }
         public IEnumerable<string> ValidWords { set; get; }
 
-        public IEnumerable<string> CreateStopList()
+        public IEnumerable<string> CreateStopList(string filename)
         {
             List<string> readArray = new List<string>();
             string temp;
-            StreamReader reader = new StreamReader(@"stopList.txt");
-            temp = reader.ReadLine();
-            while(temp != null)
+            using (StreamReader reader = new StreamReader(filename))
             {
-                if (temp != "")
-                {
-                    readArray.Add(temp.ToLower());
-                }
                 temp = reader.ReadLine();
-            }//end of while loop
+                while (temp != null)
+                {
+                    if (temp != "")
+                    {
+                        readArray.Add(temp.ToLower());
+                    }
+                    temp = reader.ReadLine();
+                }
+            }
             return readArray;
-        }//end of getStopList()
+        }
 
         /// <summary>
         /// This takes the tweet and starts to check to see if each string input has any useless words. 
@@ -56,7 +58,7 @@ namespace TweetTrim
                 HashtagSet = tweeter.HashtagSet
             };
             return nuTweeter;
-        }//end of Trim method
+        }
 
         /// <summary>
         /// This is where I send the original Tweeter's WordSet to be removed and returned. 
@@ -71,7 +73,7 @@ namespace TweetTrim
         private ICollection<string> Remove(ICollection<string> tweetWords, IEnumerable<string> stopList)
         {
             return tweetWords.Where(t => !stopList.Contains(t)).ToList();
-        }//end of remove
+        }
 
         /// <summary>
         /// This method is make sure that it is words we can keep. 
