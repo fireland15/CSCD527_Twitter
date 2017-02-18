@@ -23,6 +23,8 @@ namespace StreamProcessor
 
         private readonly IHashPairGenerator _hashPairGenerator;
 
+        private readonly IPipelineRepository _repo;
+
         private DateTime _startOn;
 
         private DateTime _stopOn;
@@ -41,12 +43,13 @@ namespace StreamProcessor
 
         public uint TweetThroughput => TweetsReceived / (uint)DateTime.Now.Subtract(_startOn).TotalSeconds;
 
-        public TwitterStreamProcessor(ITwitterCredentials credentials, ITweetFilter tweetFilter, ITweetTrim tweetTrimmer, IHashPairGenerator hashPairGenerator)
+        public TwitterStreamProcessor(ITwitterCredentials credentials, ITweetFilter tweetFilter, ITweetTrim tweetTrimmer, IHashPairGenerator hashPairGenerator, IPipelineRepository repo)
         {
             _credentials = credentials;
             _tweetFilter = tweetFilter;
             _tweetTrimmer = tweetTrimmer;
             _hashPairGenerator = hashPairGenerator;
+            _repo = repo;
 
             _stream = Stream.CreateSampleStream(_credentials);
             _stream.AddTweetLanguageFilter(LanguageFilter.English);
@@ -119,11 +122,8 @@ namespace StreamProcessor
 
         private void PersistWordHashPairs(ICollection<WordHashtagPair> wordHashPairs)
         {
-            foreach (var pair in wordHashPairs)
-            {
-                //Console.WriteLine($"{pair.Word}, {pair.HashTag}");
-                WordHashtagPairsStored++;
-            }
+            _repo.InsertMany(wordHashPairs);
+            WordHashtagPairsStored += (uint)wordHashPairs.Count;
         }
     }
 }
