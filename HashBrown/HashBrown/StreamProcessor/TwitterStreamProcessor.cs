@@ -116,6 +116,7 @@ namespace StreamProcessor
 
             try
             {
+                // Todo: Make sure to remove duplicate words and hashtags
                 ICollection<WordHashtagPair> wordHashPairs = _hashPairGenerator.GenerateHashPairs(trimmedTweeter);
                 if (wordHashPairs.Count != 0)
                 {
@@ -145,10 +146,12 @@ namespace StreamProcessor
 
         private void PersistTuples(Tweeter tweeter, int maxTupleLength = 1)
         {
-            var allWords = tweeter.WordSet.Concat(tweeter.HashtagSet).ToArray();
+            var allWords = tweeter.WordSet;
 
             //var nWordSets = allWords.PowerSet().Where(set => set.Length > 0 && set.Length <= maxTupleLength);
-            var nWordSets = allWords.Combinations(maxTupleLength);
+            // Todo: order combos by alphabet
+            // Todo: generate combos 1-k;
+            var nWordSets = allWords.Combinations(maxTupleLength).Select(set => set.OrderBy(s => s));
 
             foreach (var set in nWordSets)
             {
