@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 
 namespace Shared
 {
     public class PipelineRepository : IPipelineRepository
     {
         private readonly NpgsqlConnection _connection;
+
+        private static readonly string _streamName = "twitter_stream";
 
         public PipelineRepository(NpgsqlConnection connection)
         {
@@ -26,7 +29,7 @@ namespace Shared
 
         public void Insert(WordHashtagPair pair)
         {
-            string sql = "INSERT INTO twitter_stream (word, hashtag) VALUES (@word, @hashtag);";
+            string sql = $"INSERT INTO {_streamName} (word, hashtag) VALUES (@word, @hashtag);";
                         
             using (NpgsqlCommand command = new NpgsqlCommand(sql, _connection))
             {
@@ -50,7 +53,7 @@ namespace Shared
 
         public void InsertMany(IEnumerable<WordHashtagPair> pairs)
         {
-            string sql = "INSERT INTO twitter_stream (word, hashtag) VALUES (@word, @hashtag);";
+            string sql = $"INSERT INTO {_streamName} (word, hashtag) VALUES (@word, @hashtag);";
 
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
@@ -86,6 +89,67 @@ namespace Shared
                     }
                 }
             }
+        }
+
+        public void InsertNTuple(string[] tupleOfWords)
+        {
+            uint length = (uint)tupleOfWords.Length;
+
+            string sql = GetInsertIntoSQL(tupleOfWords);
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = sql;
+
+                    try
+                    {
+                        if (command.ExecuteNonQuery() != 1)
+                        {
+                            throw new InvalidProgramException();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (InvalidProgramException)
+                    {
+                        Console.WriteLine($"Failed to insert");
+                        Console.WriteLine(sql);
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                    }
+                }
+            }
+        }
+
+        private string GetInsertIntoSQL(string[] words)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"INSERT INTO {GetNTupleStreamName((uint)words.Length)} (");
+
+            for (uint i = 1; i < words.Length; i++)
+            {
+                sb.Append($"word{i}, "); // add column to stream for each word in tuple.
+            }
+            sb.Append($"word{words.Length}) VALUES (");
+
+            for (uint i = 0; i < words.Length - 1; i++)
+            {
+                sb.Append($"'{words[i]}', ");
+            }
+            sb.Append($"'{words[words.Length - 1]}');");
+
+            return sb.ToString();
+        }
+
+        private string GetNTupleStreamName(uint n)
+        {
+            return $"{_streamName}_{n}";
         }
     }
 }

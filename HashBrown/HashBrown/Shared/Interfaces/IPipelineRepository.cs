@@ -6,5 +6,7 @@ namespace Shared
     {
         void Insert(WordHashtagPair pair);
         void InsertMany(IEnumerable<WordHashtagPair> pairs);
+
+        void InsertNTuple(string[] tupleOfWords);
     }
 }
