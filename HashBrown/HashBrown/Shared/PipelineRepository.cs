@@ -119,9 +119,10 @@ namespace Shared
                         Console.WriteLine($"Failed to insert");
                         Console.WriteLine(sql);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        throw ex;
                     }
                 }
             }

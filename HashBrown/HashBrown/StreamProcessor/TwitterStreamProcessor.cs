@@ -62,6 +62,7 @@ namespace StreamProcessor
 
             _streamThread = new Thread(() =>
             {
+                Console.WriteLine("StartingStream");
                 _stream.StartStream();
             });
 
@@ -148,10 +149,13 @@ namespace StreamProcessor
         {
             var allWords = tweeter.WordSet;
 
-            //var nWordSets = allWords.PowerSet().Where(set => set.Length > 0 && set.Length <= maxTupleLength);
-            // Todo: order combos by alphabet
-            // Todo: generate combos 1-k;
-            var nWordSets = allWords.Combinations(maxTupleLength).Select(set => set.OrderBy(s => s));
+            IEnumerable<IOrderedEnumerable<string>> nWordSets = allWords.Combinations(1).Select(set => set.OrderBy(s => s));
+
+            for (int i = 2; i <= maxTupleLength; i++)
+            {
+                var combos = allWords.Combinations(i).Select(set => set.OrderBy(s => s));
+                nWordSets = nWordSets.Union(combos);
+            }
 
             foreach (var set in nWordSets)
             {
