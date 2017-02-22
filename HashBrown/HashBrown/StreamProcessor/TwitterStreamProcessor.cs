@@ -62,6 +62,7 @@ namespace StreamProcessor
 
             _streamThread = new Thread(() =>
             {
+                Console.WriteLine("StartingStream");
                 _stream.StartStream();
             });
 
@@ -116,6 +117,7 @@ namespace StreamProcessor
 
             try
             {
+                // Todo: Make sure to remove duplicate words and hashtags
                 ICollection<WordHashtagPair> wordHashPairs = _hashPairGenerator.GenerateHashPairs(trimmedTweeter);
                 if (wordHashPairs.Count != 0)
                 {
@@ -145,10 +147,15 @@ namespace StreamProcessor
 
         private void PersistTuples(Tweeter tweeter, int maxTupleLength = 1)
         {
-            var allWords = tweeter.WordSet.Concat(tweeter.HashtagSet).ToArray();
+            var allWords = tweeter.WordSet;
 
-            //var nWordSets = allWords.PowerSet().Where(set => set.Length > 0 && set.Length <= maxTupleLength);
-            var nWordSets = allWords.Combinations(maxTupleLength);
+            IEnumerable<IOrderedEnumerable<string>> nWordSets = allWords.Combinations(1).Select(set => set.OrderBy(s => s));
+
+            for (int i = 2; i <= maxTupleLength; i++)
+            {
+                var combos = allWords.Combinations(i).Select(set => set.OrderBy(s => s));
+                nWordSets = nWordSets.Union(combos);
+            }
 
             foreach (var set in nWordSets)
             {
