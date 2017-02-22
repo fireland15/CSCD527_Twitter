@@ -1,5 +1,6 @@
 ﻿using Shared;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using Tweetinvi;
@@ -113,10 +114,27 @@ namespace StreamProcessor
 
             TweetsAccepted++;
 
-            ICollection<WordHashtagPair> wordHashPairs = _hashPairGenerator.GenerateHashPairs(trimmedTweeter);
-            if (wordHashPairs.Count != 0)
+            try
             {
-                PersistWordHashPairs(wordHashPairs);
+                // Todo: Make sure to remove duplicate words and hashtags
+                ICollection<WordHashtagPair> wordHashPairs = _hashPairGenerator.GenerateHashPairs(trimmedTweeter);
+                if (wordHashPairs.Count != 0)
+                {
+                    PersistWordHashPairs(wordHashPairs);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            try
+            {
+                PersistTuples(trimmedTweeter, 3);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -124,6 +142,21 @@ namespace StreamProcessor
         {
             _repo.InsertMany(wordHashPairs);
             WordHashtagPairsStored += (uint)wordHashPairs.Count;
+        }
+
+        private void PersistTuples(Tweeter tweeter, int maxTupleLength = 1)
+        {
+            var allWords = tweeter.WordSet;
+
+            //var nWordSets = allWords.PowerSet().Where(set => set.Length > 0 && set.Length <= maxTupleLength);
+            // Todo: order combos by alphabet
+            // Todo: generate combos 1-k;
+            var nWordSets = allWords.Combinations(maxTupleLength).Select(set => set.OrderBy(s => s));
+
+            foreach (var set in nWordSets)
+            {
+                _repo.InsertNTuple(set.ToArray());
+            }
         }
     }
 }
