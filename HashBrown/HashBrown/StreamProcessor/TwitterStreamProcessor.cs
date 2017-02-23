@@ -147,7 +147,10 @@ namespace StreamProcessor
 
         private void PersistTuples(Tweeter tweeter, int maxTupleLength = 1)
         {
-            var allWords = tweeter.WordSet;
+            var allWords = tweeter.WordSet.Distinct();
+
+            // make sure we arent trying to make combinations longer than the original
+            maxTupleLength = maxTupleLength > allWords.Count() ? allWords.Count() : maxTupleLength;
 
             IEnumerable<IOrderedEnumerable<string>> nWordSets = allWords.Combinations(1).Select(set => set.OrderBy(s => s));
 

@@ -10,7 +10,9 @@ namespace Shared
     {
         private readonly NpgsqlConnection _connection;
 
-        private static readonly string _streamName = "twitter_stream";
+        private static readonly string _streamNameWordHashtagPairs = "word_hashtag_stream";
+
+        private static readonly string _streamNameTuples = "twitter_stream";
 
         public PipelineRepository(NpgsqlConnection connection)
         {
@@ -29,7 +31,7 @@ namespace Shared
 
         public void Insert(WordHashtagPair pair)
         {
-            string sql = $"INSERT INTO {_streamName} (word, hashtag) VALUES (@word, @hashtag);";
+            string sql = $"INSERT INTO {_streamNameWordHashtagPairs} (word, hashtag) VALUES (@word, @hashtag);";
                         
             using (NpgsqlCommand command = new NpgsqlCommand(sql, _connection))
             {
@@ -53,7 +55,7 @@ namespace Shared
 
         public void InsertMany(IEnumerable<WordHashtagPair> pairs)
         {
-            string sql = $"INSERT INTO {_streamName} (word, hashtag) VALUES (@word, @hashtag);";
+            string sql = $"INSERT INTO {_streamNameWordHashtagPairs} (word, hashtag) VALUES (@word, @hashtag);";
 
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
@@ -95,7 +97,7 @@ namespace Shared
         {
             uint length = (uint)tupleOfWords.Length;
 
-            string sql = GetInsertIntoSQL(tupleOfWords);
+            string sql = GetInsertIntoSQL(length);
 
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
@@ -104,6 +106,15 @@ namespace Shared
                     command.Transaction = transaction;
                     command.CommandType = CommandType.Text;
                     command.CommandText = sql;
+
+                    for (int i = 1; i <= length; i++)
+                    {
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    }
+                    for (int i = 0; i < length; i++)
+                    {
+                        command.Parameters[i].Value = tupleOfWords[i];
+                    }
 
                     try
                     {
@@ -128,29 +139,29 @@ namespace Shared
             }
         }
 
-        private string GetInsertIntoSQL(string[] words)
+        private string GetInsertIntoSQL(uint n)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"INSERT INTO {GetNTupleStreamName((uint)words.Length)} (");
+            sb.Append($"INSERT INTO {GetNTupleStreamName(n)} (");
 
-            for (uint i = 1; i < words.Length; i++)
+            for (uint i = 1; i < n; i++)
             {
                 sb.Append($"word{i}, "); // add column to stream for each word in tuple.
             }
-            sb.Append($"word{words.Length}) VALUES (");
+            sb.Append($"word{n}) VALUES (");
 
-            for (uint i = 0; i < words.Length - 1; i++)
+            for (uint i = 0; i < n - 1; i++)
             {
-                sb.Append($"'{words[i]}', ");
+                sb.Append($"@word{i + 1}, ");
             }
-            sb.Append($"'{words[words.Length - 1]}');");
+            sb.Append($"@word{n});");
 
             return sb.ToString();
         }
 
         private string GetNTupleStreamName(uint n)
         {
-            return $"{_streamName}_{n}";
+            return $"{_streamNameTuples}_{n}";
         }
     }
 }
