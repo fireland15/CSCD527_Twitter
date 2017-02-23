@@ -9,12 +9,12 @@ namespace TweetTrim
     public class TweetTrim : ITweetTrim
     {
 
-        public TweetTrim(string stopListFileName, string dictionaryFileName)
+        public TweetTrim(string stopListFileName, string dictionaryFileName = "")
         {
             //TODO: read in the stopList file as a Set
             StopList = CreateList(stopListFileName);
             //TODO: make a list of valid words to test that words are good.
-            ValidWords = CreateList(dictionaryFileName);
+            ValidWords = dictionaryFileName != string.Empty ? CreateList(dictionaryFileName) : null;
         }
 
         public ISet<string> StopList { set; get; }
@@ -87,6 +87,9 @@ namespace TweetTrim
         /// <returns></returns>
         private ICollection<string> Validate(ICollection<string> tweetWords, IEnumerable<string> dictionarySet)
         {
+            if (dictionarySet == null)
+                return tweetWords;
+
             return tweetWords.Where(t => dictionarySet.Contains(t)).ToList();
         }//end of Validate method
     }

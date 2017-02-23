@@ -1,7 +1,9 @@
 ﻿using Npgsql;
 using Shared;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Threading;
 using Tweetinvi;
 using Tweetinvi.Models;
@@ -22,18 +24,24 @@ namespace StreamProcessor
             string apiToken = config.AppSettings.Settings["ApiToken"].Value;
             string apiTokenSecret = config.AppSettings.Settings["ApiTokenSecret"].Value;
             string stopWordFileName = config.AppSettings.Settings["StopWordFile"].Value;
-            string connectionString = config.AppSettings.Settings["connectionString"].Value;
+            string connectionStringPipeline = config.AppSettings.Settings["connectionStringPipeline"].Value;
+            string connectionStringPostGre = config.AppSettings.Settings["connectionStringPostGre"].Value;
+            string performanceLog = config.AppSettings.Settings["performanceLog"].Value;
             Credentials = Auth.CreateCredentials(consumerKey, consumerSecret, apiToken, apiTokenSecret);
 
-            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection conPipeline = new NpgsqlConnection(connectionStringPipeline))
+            using (NpgsqlConnection conPostGre = new NpgsqlConnection(connectionStringPostGre))
             {
 
                 ITweetFilter tweetFilter = new TweetFilter();
                 ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim(stopWordFileName);
                 IHashPairGenerator pairGenerator = new HashPairGenerator();
-                IPipelineRepository pipelineRepo = new PipelineRepository(con);
+                IPipelineRepository dupRepo = 
+                    new DuplicateRepository(
+                        new PipelineRepository(conPipeline), 
+                        new PostGreSqlRepository(conPostGre));
 
-                TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator, pipelineRepo);
+                TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator, dupRepo);
 
                 streamProcessor.Start();
 
@@ -41,17 +49,51 @@ namespace StreamProcessor
 
                 var t = new Thread(() =>
                 {
+                    int lastTweetsReceived = 0;
+                    int lastTweetsAccepted = 0;
+                    int lastPairsStored = 0;
+                    Dictionary<int, int> lastWordSetsStored = new Dictionary<int, int> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
+
+                    DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
                     while (!stopMonitoring)
                     {
                         try
                         {
-                            Console.WriteLine($"Receiving {streamProcessor.TweetThroughput} tweets/s.");
+                            int tweetsReceived = (int)streamProcessor.TweetsReceived;
+                            int newTweets = tweetsReceived - lastTweetsReceived;
+                            lastTweetsReceived = tweetsReceived;
+
+                            int tweetsAccepted = (int)streamProcessor.TweetsAccepted;
+                            int newTweetsAccepted = tweetsAccepted - lastTweetsAccepted;
+                            lastTweetsAccepted = tweetsAccepted;
+
+                            int pairsStored = (int)streamProcessor.WordHashtagPairsStored;
+                            int newPairsStored = pairsStored - lastPairsStored;
+                            lastPairsStored = pairsStored;
+
+                            int[] newWordSetsStored = new int[5];
+
+                            for (int i = 1; i <= 5; i++)
+                            {
+                                int wordSetsStored = (int)streamProcessor.WordSetsStored[i];
+                                newWordSetsStored[i - 1] = wordSetsStored - lastWordSetsStored[i];
+                                lastWordSetsStored[i] = wordSetsStored;
+                            }
+
+                            double timestamp = (DateTime.Now.ToUniversalTime() - origin).TotalSeconds;
+
+                            using (StreamWriter sw = new FileInfo(performanceLog).AppendText())
+                            {
+                                sw.WriteLine($"{timestamp:0},{newTweets},{newTweetsAccepted},{newPairsStored},{newWordSetsStored[0]},{newWordSetsStored[1]},{newWordSetsStored[2]},{newWordSetsStored[3]},{newWordSetsStored[4]}");
+                            }
+                                
                         }
-                        catch (DivideByZeroException)
+                        catch (Exception)
                         {
                             /* Do nothing */
                         }
-                        Thread.Sleep(1000);
+                        Thread.Sleep(5000); // sleep for a minute
                     }
                 });
 

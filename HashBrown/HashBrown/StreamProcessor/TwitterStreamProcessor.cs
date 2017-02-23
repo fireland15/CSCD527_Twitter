@@ -32,11 +32,13 @@ namespace StreamProcessor
 
         private Thread _streamThread;
 
-        public uint TweetsReceived { get; set; }
+        public uint TweetsReceived { get; set; } = 0;
 
-        public uint TweetsAccepted { get; set; }
+        public uint TweetsAccepted { get; set; } = 0;
 
-        public uint WordHashtagPairsStored { get; set; }
+        public uint WordHashtagPairsStored { get; set; } = 0;
+
+        public Dictionary<int, uint> WordSetsStored { get; set; } = new Dictionary<int, uint> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
 
         public int MilliSecondsRunning => DateTime.Now.Subtract(_startOn).Milliseconds;
 
@@ -108,10 +110,6 @@ namespace StreamProcessor
             }
 
             Tweeter trimmedTweeter = _tweetTrimmer.Trim(tweeter);
-            //if (!trimmedTweeter.IsValid())
-            //{
-            //    return;
-            //}
 
             TweetsAccepted++;
 
@@ -131,7 +129,7 @@ namespace StreamProcessor
 
             try
             {
-                PersistTuples(trimmedTweeter, 3);
+                PersistTuples(trimmedTweeter, 5);
             }
             catch (Exception ex)
             {
@@ -163,6 +161,7 @@ namespace StreamProcessor
             foreach (var set in nWordSets)
             {
                 _repo.InsertNTuple(set.ToArray());
+                WordSetsStored[set.Count()]++;
             }
         }
     }
