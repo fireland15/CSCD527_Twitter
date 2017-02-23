@@ -9,20 +9,20 @@ namespace TweetTrim
     public class TweetTrim : ITweetTrim
     {
 
-        public TweetTrim(string stopListFileName)
+        public TweetTrim(string stopListFileName, string dictionaryFileName)
         {
-            //TODO: read in the stopList file as an IEnum 
-            StopList = CreateStopList(stopListFileName);
+            //TODO: read in the stopList file as a Set
+            StopList = CreateList(stopListFileName);
             //TODO: make a list of valid words to test that words are good.
-            ValidWords = null;
+            ValidWords = CreateList(dictionaryFileName);
         }
 
-        public IEnumerable<string> StopList { set; get; }
-        public IEnumerable<string> ValidWords { set; get; }
+        public ISet<string> StopList { set; get; }
+        public ISet<string> ValidWords { set; get; }
 
-        public IEnumerable<string> CreateStopList(string filename)
+        private ISet<string> CreateList(string filename)
         {
-            List<string> readArray = new List<string>();
+            ISet<string> readArray = new SortedSet<string>();
             string temp;
             using (StreamReader reader = new StreamReader(filename))
             {
@@ -54,7 +54,7 @@ namespace TweetTrim
         {
             Tweeter nuTweeter = new Tweeter
             {
-                WordSet = Remove(tweeter.WordSet, StopList),
+                WordSet = Validate(Remove(tweeter.WordSet, StopList), ValidWords),
                 HashtagSet = tweeter.HashtagSet
             };
             return nuTweeter;
@@ -78,16 +78,16 @@ namespace TweetTrim
         /// <summary>
         /// This method is make sure that it is words we can keep. 
         /// </summary>
-        /// <param name="wordsToKeep">
+        /// <param name="tweetWords">
         /// This is the collection of words that are valide to keep or remove.
         /// </param>
-        /// <param name="wordSet">
+        /// <param name="dictionarySet">
         /// This is the wordSet I am processing of valid words. Use english words from an english dictionary.  
         /// </param>
         /// <returns></returns>
-        private ICollection<string> Validate(ICollection<string> wordsToKeep, IEnumerable<string> wordSet)
+        private ICollection<string> Validate(ICollection<string> tweetWords, IEnumerable<string> dictionarySet)
         {
-            throw new NotImplementedException();
-        }
+            return tweetWords.Where(t => dictionarySet.Contains(t)).ToList();
+        }//end of Validate method
     }
 }
