@@ -14,7 +14,7 @@ namespace HashtagGenerator.Interfaces
 
         IList<IOrderedEnumerable<string>> UnionSets(IList<string> itemSet, int maxTupleLength);
 
-        int GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
+        void GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
 
         IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words, int minSupport);
     }

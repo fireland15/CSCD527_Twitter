@@ -67,6 +67,10 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void GenerateFrequentItemSets()
         {
+            var sut = new Apriori();
+            var test = new string[] {"bannana","apple","potato","grape"};
+
+            var result = sut.GenerateFrequentItemSets(test, 1);
         }
 
     }
