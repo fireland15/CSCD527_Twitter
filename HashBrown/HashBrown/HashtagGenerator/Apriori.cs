@@ -1,4 +1,4 @@
-﻿using HashtagGenerator.Interfaces;
+using HashtagGenerator.Interfaces;
 using StreamProcessor;
 using System;
 using System.Collections.Generic;

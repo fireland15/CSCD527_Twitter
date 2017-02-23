@@ -103,11 +103,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DuplicateRepository.cs" />
     <Compile Include="Interfaces\IPipelineRepository.cs" />
     <Compile Include="Models\Tweeter.cs" />
     <Compile Include="PipelineRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\WordHashtagPair.cs" />
+    <Compile Include="WordSetRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

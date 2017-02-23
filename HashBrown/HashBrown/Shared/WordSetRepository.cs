@@ -2,19 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Shared
 {
-    public class PipelineRepository : IPipelineRepository
+    public class PostGreSqlRepository : IPipelineRepository
     {
         private readonly NpgsqlConnection _connection;
 
-        private static readonly string _streamNameWordHashtagPairs = "word_hashtag_stream";
+        private static readonly string _wordSetBaseName = "word_set";
 
-        private static readonly string _streamNameTuples = "twitter_stream";
-
-        public PipelineRepository(NpgsqlConnection connection)
+        public PostGreSqlRepository(NpgsqlConnection connection)
         {
             if (connection == null)
             {
@@ -31,12 +31,12 @@ namespace Shared
 
         public void Insert(WordHashtagPair pair)
         {
-            string sql = $"INSERT INTO {_streamNameWordHashtagPairs} (word, hashtag) VALUES (@word, @hashtag);";
-                        
+            string sql = $"INSERT INTO word_hashtag_pairs (word, hashtag) VALUES (@word, @hashtag);";
+
             using (NpgsqlCommand command = new NpgsqlCommand(sql, _connection))
             {
-                var transaction = _connection.BeginTransaction();
-                command.Transaction = transaction;
+                //var transaction = _connection.BeginTransaction();
+                //command.Transaction = transaction;
 
                 command.Parameters.Add("@word", NpgsqlTypes.NpgsqlDbType.Varchar).Value = pair.Word;
                 command.Parameters.Add("@hashtag", NpgsqlTypes.NpgsqlDbType.Varchar).Value = pair.HashTag;
@@ -44,20 +44,20 @@ namespace Shared
 
                 try
                 {
-                    transaction.Commit();
+                 //   transaction.Commit();
                 }
                 catch (Exception)
                 {
-                    transaction.Rollback();
+                 //   transaction.Rollback();
                 }
             }
         }
 
         public void InsertMany(IEnumerable<WordHashtagPair> pairs)
         {
-            string sql = $"INSERT INTO {_streamNameWordHashtagPairs} (word, hashtag) VALUES (@word, @hashtag);";
+            string sql = $"INSERT INTO word_hashtag_pairs (word, hashtag) VALUES (@word, @hashtag);";
 
-           // using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            //using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             //{
                 using (NpgsqlCommand command = _connection.CreateCommand())
                 {
@@ -87,7 +87,7 @@ namespace Shared
                         //transaction.Rollback();
                     }
                 }
-            //}
+           // }
         }
 
         public void InsertNTuple(string[] tupleOfWords)
@@ -115,6 +115,7 @@ namespace Shared
 
                     try
                     {
+
                         command.ExecuteNonQueryAsync();
 
                         //transaction.Commit();
@@ -155,7 +156,7 @@ namespace Shared
 
         private string GetNTupleStreamName(uint n)
         {
-            return $"{_streamNameTuples}_{n}";
+            return $"{_wordSetBaseName}_{n}";
         }
     }
 }
