@@ -44,11 +44,11 @@ namespace Shared
 
                 try
                 {
-                 //   transaction.Commit();
+                    //transaction.Commit();
                 }
                 catch (Exception)
                 {
-                 //   transaction.Rollback();
+                    //transaction.Rollback();
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace Shared
                         //transaction.Rollback();
                     }
                 }
-           // }
+            //}
         }
 
         public void InsertNTuple(string[] tupleOfWords)

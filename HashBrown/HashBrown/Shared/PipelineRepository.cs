@@ -40,7 +40,7 @@ namespace Shared
 
                 command.Parameters.Add("@word", NpgsqlTypes.NpgsqlDbType.Varchar).Value = pair.Word;
                 command.Parameters.Add("@hashtag", NpgsqlTypes.NpgsqlDbType.Varchar).Value = pair.HashTag;
-                command.ExecuteNonQueryAsync();
+                command.ExecuteNonQuery();
 
                 try
                 {
@@ -57,11 +57,11 @@ namespace Shared
         {
             string sql = $"INSERT INTO {_streamNameWordHashtagPairs} (word, hashtag) VALUES (@word, @hashtag);";
 
-           // using (NpgsqlTransaction transaction = _connection.BeginTransaction())
-            //{
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
                 using (NpgsqlCommand command = _connection.CreateCommand())
                 {
-                    //command.Transaction = transaction;
+                    command.Transaction = transaction;
                     command.CommandType = CommandType.Text;
                     command.CommandText = sql;
                     command.Parameters.Add(new NpgsqlParameter("@word", NpgsqlTypes.NpgsqlDbType.Varchar));
@@ -73,10 +73,10 @@ namespace Shared
                         {
                             command.Parameters[0].Value = pair.Word;
                             command.Parameters[1].Value = pair.HashTag;
-                            command.ExecuteNonQueryAsync();
+                            command.ExecuteNonQuery();
                         }
 
-                        //transaction.Commit();
+                        transaction.Commit();
                     }
                     catch (InvalidProgramException)
                     {
@@ -84,10 +84,10 @@ namespace Shared
                     }
                     catch (Exception)
                     {
-                        //transaction.Rollback();
+                        transaction.Rollback();
                     }
                 }
-            //}
+            }
         }
 
         public void InsertNTuple(string[] tupleOfWords)
@@ -96,11 +96,11 @@ namespace Shared
 
             string sql = GetInsertIntoSQL(length);
 
-            //using (NpgsqlTransaction transaction = _connection.BeginTransaction())
-            //{
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
                 using (NpgsqlCommand command = _connection.CreateCommand())
                 {
-                    //command.Transaction = transaction;
+                    command.Transaction = transaction;
                     command.CommandType = CommandType.Text;
                     command.CommandText = sql;
 
@@ -115,9 +115,9 @@ namespace Shared
 
                     try
                     {
-                        command.ExecuteNonQueryAsync();
+                        command.ExecuteNonQuery();
 
-                        //transaction.Commit();
+                        transaction.Commit();
                     }
                     catch (InvalidProgramException)
                     {
@@ -126,11 +126,11 @@ namespace Shared
                     }
                     catch (Exception ex)
                     {
-                        //transaction.Rollback();
+                        transaction.Rollback();
                         throw ex;
                     }
                 }
-            //}
+            }
         }
 
         private string GetInsertIntoSQL(uint n)

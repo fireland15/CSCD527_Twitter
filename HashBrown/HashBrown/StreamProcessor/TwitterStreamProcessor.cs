@@ -129,7 +129,7 @@ namespace StreamProcessor
 
             try
             {
-                PersistTuples(trimmedTweeter, 5);
+                PersistTuples(trimmedTweeter, 3);
             }
             catch (Exception ex)
             {
