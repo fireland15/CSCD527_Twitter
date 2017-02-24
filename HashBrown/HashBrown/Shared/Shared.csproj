@@ -105,6 +105,7 @@
   <ItemGroup>
     <Compile Include="Interfaces\IPipelineRepository.cs" />
     <Compile Include="Models\Tweeter.cs" />
+    <Compile Include="NaiveObjects.cs" />
     <Compile Include="PipelineRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\WordHashtagPair.cs" />
