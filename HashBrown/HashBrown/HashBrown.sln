@@ -29,6 +29,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{56972D32-4
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashtagGenerator", "HashtagGenerator\HashtagGenerator.csproj", "{E17C0C9F-8735-42AE-A1D1-D3B952DEBF11}"
+	ProjectSection(ProjectDependencies) = postProject
+		{058821B0-1615-4A9E-9D0E-396F3CB7B231} = {058821B0-1615-4A9E-9D0E-396F3CB7B231}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.HashtagGenerator", "Test.HashtagGenerator\Test.HashtagGenerator.csproj", "{95E52F67-E1B1-4FEF-81E8-B7E8F4E3316F}"
 EndProject

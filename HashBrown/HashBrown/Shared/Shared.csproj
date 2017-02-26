@@ -104,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DuplicateRepository.cs" />
+    <Compile Include="Interfaces\IAprioriRepository.cs" />
     <Compile Include="Interfaces\IPipelineRepository.cs" />
     <Compile Include="Models\Tweeter.cs" />
     <Compile Include="NaiveObjects.cs" />

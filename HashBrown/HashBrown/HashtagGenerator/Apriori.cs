@@ -1,11 +1,9 @@
 using HashtagGenerator.Interfaces;
 using StreamProcessor;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Shared;
 
 namespace HashtagGenerator
 {
@@ -15,7 +13,7 @@ namespace HashtagGenerator
         {
             var words = ProcessUserGeneratedText(text);
 
-            GenerateAssociationRules(words, 3, 1, 1);
+            GenerateAssociationRules(words, 3, 1, 1); 
 
             return null;
         }
@@ -126,16 +124,6 @@ namespace HashtagGenerator
                         {
                             //add the AC->B to the ruleSet
                         }
-                        break;
-
-                    //4 n itemsets
-                    case 3:
-                      //same as above.... am i forgetting a way to prune?????????
-                        break;
-
-                    //5 n itemsets
-                    case 4:
-
                         break;
                 }
 
