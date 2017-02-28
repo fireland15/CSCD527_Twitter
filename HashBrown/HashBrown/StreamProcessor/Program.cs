@@ -87,7 +87,7 @@ namespace StreamProcessor
 
                             using (StreamWriter sw = new FileInfo(performanceLog).AppendText())
                             {
-                                sw.WriteLine($"{timestamp:0},{newTweets},{newTweetsAccepted},{newPairsStored},{newWordSetsStored[0]},{newWordSetsStored[1]},{newWordSetsStored[2]},{newWordSetsStored[3]},{newWordSetsStored[4]}");
+                                sw.WriteLine($"{DateTime.Now.ToLongTimeString()},{newTweets},{newTweetsAccepted},{newPairsStored},{newWordSetsStored[0]},{newWordSetsStored[1]},{newWordSetsStored[2]},{newWordSetsStored[3]},{newWordSetsStored[4]}, {streamProcessor.StreamThreadState().ToString()}");
                             }
                                 
                         }

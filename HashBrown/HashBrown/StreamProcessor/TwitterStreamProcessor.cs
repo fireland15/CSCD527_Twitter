@@ -58,14 +58,20 @@ namespace StreamProcessor
             _stream.AddTweetLanguageFilter(LanguageFilter.English);
         }
 
+        public ThreadState StreamThreadState()
+        {
+            return _streamThread.ThreadState;
+        }
+
         public void Start()
         {
             RegisterEventHandlers();
 
             _streamThread = new Thread(() =>
             {
-                Console.WriteLine("StartingStream");
+                Console.WriteLine("Starting Stream");
                 _stream.StartStream();
+                Console.WriteLine("Started Stream");
             });
 
             _startOn = DateTime.Now;
@@ -87,6 +93,26 @@ namespace StreamProcessor
         private void RegisterEventHandlers()
         {
             _stream.TweetReceived += ReceiveTweet;
+            _stream.WarningFallingBehindDetected += (sender, args) =>
+            {
+                Console.WriteLine($"Falling Behind - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
+                Console.WriteLine($"msg: {args.WarningMessage}");
+            };
+            _stream.DisconnectMessageReceived += (sender, args) =>
+            {
+                Console.WriteLine($"Disconnected - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
+                Console.WriteLine($"msg: {args.DisconnectMessage}");
+            };
+            _stream.LimitReached += (sender, args) =>
+            {
+                Console.WriteLine($"Limit reached - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
+                Console.WriteLine($"msg: {args.NumberOfTweetsNotReceived}");
+            };
+            _stream.StreamStopped += (sender, args) =>
+            {
+                Console.WriteLine($"Stream stopped - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
+                Console.WriteLine($"msg: {args?.Exception?.Message}");
+            };
         }
 
         private void ReceiveTweet(object sender, TweetReceivedEventArgs args)
