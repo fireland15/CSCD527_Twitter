@@ -30,7 +30,9 @@ namespace StreamProcessor
 
         private DateTime _stopOn;
 
-        private Thread _streamThread;
+        private bool _isSupposedToBeStopped = false;
+
+        public string State => _stream.StreamState.ToString();
 
         public uint TweetsReceived { get; set; } = 0;
 
@@ -58,30 +60,20 @@ namespace StreamProcessor
             _stream.AddTweetLanguageFilter(LanguageFilter.English);
         }
 
-        public ThreadState StreamThreadState()
-        {
-            return _streamThread.ThreadState;
-        }
-
         public void Start()
         {
             RegisterEventHandlers();
 
-            _streamThread = new Thread(() =>
-            {
-                Console.WriteLine("Starting Stream");
-                _stream.StartStream();
-                Console.WriteLine("Started Stream");
-            });
-
+            Console.WriteLine("Starting Stream");
             _startOn = DateTime.Now;
-            _streamThread.Start();
+            _stream.StartStream();
+            Console.WriteLine("Stopped Streaming");
         }
 
         public string Stop()
         {
+            _isSupposedToBeStopped = true;
             _stream.StopStream();
-            _streamThread.Join();
             while (_stream.StreamState != StreamState.Stop)
             {
                 /* Wait for stream to stop */
@@ -110,8 +102,15 @@ namespace StreamProcessor
             };
             _stream.StreamStopped += (sender, args) =>
             {
-                Console.WriteLine($"Stream stopped - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
-                Console.WriteLine($"msg: {args?.Exception?.Message}");
+                if (_isSupposedToBeStopped)
+                {
+                    Console.WriteLine("Stopping stream - User terminated stream.");
+                }
+                else
+                {
+                    Console.WriteLine($"Stream stopped - {(DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds}");
+                    Console.WriteLine($"msg: {args?.Exception?.Message}");
+                }
             };
         }
 
