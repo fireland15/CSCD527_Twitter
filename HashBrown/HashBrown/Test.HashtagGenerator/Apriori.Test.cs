@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HashtagGenerator;
+using Moq;
 using Enumerable = System.Linq.Enumerable;
 using Shared.Interfaces;
 
@@ -35,14 +36,14 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void UnionSetsTest_2Items()
         {
-            var set = new List<string> {"bannana", "apple", "potato"};
+            var set = new List<string> {"banana", "apple", "potato"};
             var sut = new Apriori(null);
             
             var result = sut.UnionSets(set, 2);
 
             Assert.AreEqual(result[0].ElementAt(0) , "apple");
-            Assert.AreEqual(result[0].ElementAt(1), "bannana");
-            Assert.AreEqual(result[1].ElementAt(0), "bannana");
+            Assert.AreEqual(result[0].ElementAt(1), "banana");
+            Assert.AreEqual(result[1].ElementAt(0), "banana");
             Assert.AreEqual(result[1].ElementAt(1), "potato");
             Assert.AreEqual(result[2].ElementAt(0), "apple");
             Assert.AreEqual(result[2].ElementAt(1), "potato");   
@@ -51,7 +52,7 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void UnionSetsTest_3Items()
         {
-            var set = new List<string> { "bannana", "apple", "potato", "grape" };
+            var set = new List<string> { "banana", "apple", "potato", "grape" };
             var sut = new Apriori(null);
 
             var results = sut.UnionSets(set, 3);
@@ -62,16 +63,51 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void GenerateAssociationRules()
         {
+
         }
 
         [TestMethod]
         public void GenerateFrequentItemSets()
         {
             var sut = new Apriori(null);
-            var test = new string[] {"bannana","apple","potato","grape"};
+            var test = new string[] {"banana","apple","potato","grape"};
 
             var result = sut.GenerateFrequentItemSets(test, 1);
         }
+
+        [TestMethod]
+        public void CalculateAssociationRulesFor2ItemSetsTest__NoSupport()
+        {
+            var mockrepo = new Mock<IAprioriRepository>();
+            mockrepo.Setup(m => m.GetCountSingle("banana")).Returns(10);
+            mockrepo.Setup(m => m.GetCountSingle("apple")).Returns(12);
+            mockrepo.Setup(m => m.GetCountDouble("apple", "banana")).Returns(12);
+
+            var sut = new Apriori(mockrepo.Object);
+
+            var test = new List<string> {"apple", "banana"};
+
+            var result = sut.CalculateAssociationRulesFor2ItemSets(test, 1, 1, 100);
+            //Assert ??????
+        }
+
+        [TestMethod]
+        public void CalculateAssociationRulesFor2ItemSetsTest__1Rule()
+        {
+            var mockrepo = new Mock<IAprioriRepository>();
+            mockrepo.Setup(m => m.GetCountSingle("banana")).Returns(50);
+            mockrepo.Setup(m => m.GetCountSingle("apple")).Returns(20);
+            mockrepo.Setup(m => m.GetCountDouble("apple", "banana")).Returns(55);
+
+            var sut = new Apriori(mockrepo.Object);
+
+            var test = new List<string> { "apple", "banana" };
+
+            var result = sut.CalculateAssociationRulesFor2ItemSets(test, .5, 2, 100);
+            //Assert ??????
+        }
+
+
 
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HashtagGenerator.Interfaces
 {
-    interface IApriori
+    public interface IApriori
     {
         string[] CreateHashtagsApriori(string text, int minSupport);
 
@@ -14,9 +14,13 @@ namespace HashtagGenerator.Interfaces
 
         IList<IOrderedEnumerable<string>> UnionSets(IList<string> itemSet, int maxTupleLength);
 
-        void GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
+        List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
 
         IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words, int minSupport);
+
+        List<string> CalculateAssociationRulesFor3ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total);
+
+        List<string> CalculateAssociationRulesFor2ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total);
     }
 
 }
