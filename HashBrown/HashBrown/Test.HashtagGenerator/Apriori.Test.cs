@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HashtagGenerator;
 using Enumerable = System.Linq.Enumerable;
+using Shared.Interfaces;
 
 namespace Test.HashtagGenerator
 {
@@ -19,9 +20,8 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void ProcessUserGeneratedTextTest()
         {
-            var text = "This, is my! super Cool Tweet!!!";
-
-            var sut = new Apriori();
+            var text = "This, is my! super Cool Tweet!!!";  
+            var sut = new Apriori(null);
             var result = sut.ProcessUserGeneratedText(text);
 
             Assert.AreEqual(result[0], "this");
@@ -36,7 +36,7 @@ namespace Test.HashtagGenerator
         public void UnionSetsTest_2Items()
         {
             var set = new List<string> {"bannana", "apple", "potato"};
-            var sut = new Apriori();
+            var sut = new Apriori(null);
             
             var result = sut.UnionSets(set, 2);
 
@@ -52,7 +52,7 @@ namespace Test.HashtagGenerator
         public void UnionSetsTest_3Items()
         {
             var set = new List<string> { "bannana", "apple", "potato", "grape" };
-            var sut = new Apriori();
+            var sut = new Apriori(null);
 
             var results = sut.UnionSets(set, 3);
 
@@ -67,7 +67,7 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void GenerateFrequentItemSets()
         {
-            var sut = new Apriori();
+            var sut = new Apriori(null);
             var test = new string[] {"bannana","apple","potato","grape"};
 
             var result = sut.GenerateFrequentItemSets(test, 1);

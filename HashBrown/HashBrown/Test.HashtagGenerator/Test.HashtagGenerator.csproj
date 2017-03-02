@@ -58,6 +58,10 @@
       <Project>{E17C0C9F-8735-42AE-A1D1-D3B952DEBF11}</Project>
       <Name>HashtagGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{058821B0-1615-4A9E-9D0E-396F3CB7B231}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
