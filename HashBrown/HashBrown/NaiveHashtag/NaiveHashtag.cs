@@ -4,11 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared.Naive;
+using Shared.Interfaces;
 
 namespace NaiveHashtag
 {
     public class NaiveHashtag : INaiveHashtag
-    { 
+    {
+        private readonly INaiveRepository _repo;
+
+        public NaiveHashtag(INaiveRepository repo)
+        {
+            if (repo == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            _repo = repo;
+        }
+
         /// <summary>
         /// This gets the top hashtags from the group of words in the tweet. 
         /// </summary>
@@ -17,7 +30,7 @@ namespace NaiveHashtag
         /// <returns></returns>
         public ICollection<string> getHashtags(IEnumerable<string> tweet, int numberOfHashtags)
         {
-            NaiveList list = HashtagPairs(tweet.ToList<string>());
+            NaiveList list = _repo.GetNaiveList(tweet);
             ICollection<HashtagAndCount> topHashtags = Score(list, numberOfHashtags);
 
             return MakeStringCollection(topHashtags);
@@ -42,7 +55,7 @@ namespace NaiveHashtag
         /// <returns></returns>
         private ICollection<HashtagAndCount> Score(NaiveList naiveList, int numberOfHashtags)
         {
-            int threashold  = 1;
+            int threashold  = 0;
             ICollection<HashtagAndCount> collisionList = CreateCollisionList(naiveList);
             while(collisionList.Count > numberOfHashtags)
             {

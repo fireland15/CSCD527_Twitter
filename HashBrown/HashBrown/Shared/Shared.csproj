@@ -103,6 +103,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\INaiveRepository.cs" />
     <Compile Include="Interfaces\IPipelineRepository.cs" />
     <Compile Include="Models\Tweeter.cs" />
     <Compile Include="NaiveObjects.cs" />

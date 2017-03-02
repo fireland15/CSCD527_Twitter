@@ -29,7 +29,8 @@ namespace StreamProcessor
             {
 
                 ITweetFilter tweetFilter = new TweetFilter();
-                ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim(stopWordFileName);
+                //TODO: I added a location to the file name. This should be fixed later. 
+                ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim(stopWordFileName, "dictionary.txt");
                 IHashPairGenerator pairGenerator = new HashPairGenerator();
                 IPipelineRepository pipelineRepo = new PipelineRepository(con);
 
