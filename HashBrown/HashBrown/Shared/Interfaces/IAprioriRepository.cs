@@ -2,7 +2,7 @@
 
 namespace Shared.Interfaces
 {
-    internal interface IAprioriRepository
+    public interface IAprioriRepository
     {
         /// <summary>
         /// Get the count of transactions that contain the provided word set
