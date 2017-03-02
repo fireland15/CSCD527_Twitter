@@ -30,18 +30,20 @@ namespace StreamProcessor
             Credentials = Auth.CreateCredentials(consumerKey, consumerSecret, apiToken, apiTokenSecret);
 
             using (NpgsqlConnection conPipeline = new NpgsqlConnection(connectionStringPipeline))
-            using (NpgsqlConnection conPostGre = new NpgsqlConnection(connectionStringPostGre))
+            //using (NpgsqlConnection conPostGre = new NpgsqlConnection(connectionStringPostGre))
             {
 
                 ITweetFilter tweetFilter = new TweetFilter();
                 ITweetTrim tweetTrimmer = new TweetTrim.TweetTrim(stopWordFileName);
                 IHashPairGenerator pairGenerator = new HashPairGenerator();
-                IPipelineRepository dupRepo = 
-                    new DuplicateRepository(
-                        new PipelineRepository(conPipeline), 
-                        new PostGreSqlRepository(conPostGre));
+                //IPipelineRepository dupRepo = 
+                //    new DuplicateRepository(
+                //        new PipelineRepository(conPipeline), 
+                //        new PostGreSqlRepository(conPostGre));
 
-                TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator, dupRepo);
+                IPipelineRepository repo = new PipelineRepository(conPipeline);
+
+                TwitterStreamProcessor streamProcessor = new TwitterStreamProcessor(Credentials, tweetFilter, tweetTrimmer, pairGenerator, repo);
 
                 streamProcessor.Start();
 
@@ -85,7 +87,7 @@ namespace StreamProcessor
 
                             using (StreamWriter sw = new FileInfo(performanceLog).AppendText())
                             {
-                                sw.WriteLine($"{timestamp:0},{newTweets},{newTweetsAccepted},{newPairsStored},{newWordSetsStored[0]},{newWordSetsStored[1]},{newWordSetsStored[2]},{newWordSetsStored[3]},{newWordSetsStored[4]}");
+                                sw.WriteLine($"{DateTime.Now.ToLongTimeString()},{newTweets},{newTweetsAccepted},{newPairsStored},{newWordSetsStored[0]},{newWordSetsStored[1]},{newWordSetsStored[2]},{newWordSetsStored[3]},{newWordSetsStored[4]}, {streamProcessor.StreamThreadState().ToString()}");
                             }
                                 
                         }
