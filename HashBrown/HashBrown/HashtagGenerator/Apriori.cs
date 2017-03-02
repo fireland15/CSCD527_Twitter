@@ -76,7 +76,7 @@ namespace HashtagGenerator
 
             //calculate support
 
-            var support = (double)numOfTotalSet / total;
+            var support = (double)numOfTotalSet / total; 
 
             if (support < minSupportRules) //no need to continue, it doesnt meet support threshold
             {
@@ -179,7 +179,7 @@ namespace HashtagGenerator
                 }
             }
 
-            var candidatePairs = UnionSets(frequentItemsL1, 2);
+            var candidatePairs = _repository.GetAll2ItemSets(frequentItemsL1);
             var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
 
             foreach (var wordset in candidatePairs)
@@ -191,7 +191,7 @@ namespace HashtagGenerator
                 }
             }
 
-            candidatePairs = UnionSets(frequentItemsL1, 3);
+           // candidatePairs = UnionSets(frequentItemsL1, 3);
             var frequentItemsL3 = new List<IOrderedEnumerable<string>>();
 
             foreach (var wordset in candidatePairs)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Shared.Interfaces
 {
@@ -34,5 +35,12 @@ namespace Shared.Interfaces
         /// </summary>
         /// <returns></returns>
         int GetTotal();
+
+        /// <summary>
+        /// Get all of the two word item sets that contain the words passed in
+        /// </summary>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words);
     }
 }
