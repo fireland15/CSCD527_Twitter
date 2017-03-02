@@ -36,11 +36,11 @@ namespace Tests.NaiveHashtags
         {
             INaiveRepository _repo = new TestNaiveRepository();
             ICollection<string> tweet = new List<string>();
-            string[] tweetString = { "No", "new", "snl", "tonight!!!", "Instead", "I'll", "do", "as", "my", "Psychiatrist", "says", "by", "getting", "some", "more", "sleep", "to", "try", "to", "reduce", "my", "hallucinations", "&", "bed", "wetting.", "snl", "wet", "snl", "snl", "wet", "no" };
+            string[] tweetString = { "No", "new", "snl", "tonight!!!", "Instead", "I'll", "do", "as", "my", "Psychiatrist", "says", "by", "getting", "some", "more", "sleep", "to", "try", "to", "reduce", "my", "hallucinations", "&", "bed", "wetting.", "snl", "wet", "snl", "snl", "wet", "no", "wet", "wet", "wet", "snl", "snl" };
             for (int i = 0; i < tweetString.Length; i++)
                 tweet.Add(tweetString[i]);
             NaiveHashtag.NaiveHashtag hashtag = new NaiveHashtag.NaiveHashtag(_repo); //change me to not be null
-            tweet = hashtag.getHashtags(tweet, 1);
+            tweet = hashtag.getHashtags(tweet, 3);
             int stopPoint = 0;
         }//end of HashtagPairs
 

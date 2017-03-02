@@ -83,12 +83,11 @@ namespace NaiveHashtag
         /// <returns></returns>
         private ICollection<HashtagAndCount> RecreateCount(NaiveList naiveList, ICollection<HashtagAndCount> collisionList)
         {
-            ICollection<HashtagAndCount> recreated = new List<HashtagAndCount>();
             foreach (HashtagAndCount tag in collisionList)
             {
                 tag.Count = FindCount(naiveList, tag.Hashtag);
             }
-            return recreated;
+            return collisionList;
         }//end of recreatecount
 
         /// <summary>
