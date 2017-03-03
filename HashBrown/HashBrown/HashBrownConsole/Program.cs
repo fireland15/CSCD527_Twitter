@@ -7,6 +7,7 @@ using HashtagGenerator;
 using Npgsql;
 using System.Configuration;
 using Shared.Interfaces;
+using NaiveHashtag;
 
 namespace HashBrownConsole
 {
@@ -18,6 +19,7 @@ namespace HashBrownConsole
 
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {
+                /*
                 IAprioriRepository repo = new AprioriRepository(con);
 
 
@@ -56,6 +58,16 @@ namespace HashBrownConsole
                 // Test getting count of three words only
                 int tweetCount = repo.GetTotal();
                 Console.WriteLine(tweetCount);
+                */
+
+                INaiveRepository naiveRepo = new NaiveRepository(con);
+                Naive naive = new Naive(naiveRepo);
+
+                var hashtags = naive.getHashtags(new string[] { "trump" }, 20);
+                foreach (var tag in hashtags)
+                {
+                    Console.WriteLine(tag);
+                }
             }
         }
     }

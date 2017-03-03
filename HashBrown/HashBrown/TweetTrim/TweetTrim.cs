@@ -11,7 +11,7 @@ namespace TweetTrim
 
         public TweetTrim(string stopListFileName, string dictionaryFileName = "")
         {
-            //TODO: read in the stopList file as a Set
+            //read in the stopList file as a Set
             StopList = CreateList(stopListFileName);
             //TODO: make a list of valid words to test that words are good.
             ValidWords = dictionaryFileName != string.Empty ? CreateList(dictionaryFileName) : null;
@@ -54,9 +54,10 @@ namespace TweetTrim
         {
             Tweeter nuTweeter = new Tweeter
             {
-                WordSet = Validate(Remove(tweeter.WordSet, StopList), ValidWords),
+                WordSet = Remove(tweeter.WordSet, StopList),
                 HashtagSet = tweeter.HashtagSet
             };
+            //nuTweeter.WordSet = Validate(nuTweeter.WordSet, ValidWords);
             return nuTweeter;
         }
 

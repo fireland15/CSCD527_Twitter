@@ -138,13 +138,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HashtagGenerator\HashtagGenerator.csproj">
       <Project>{e17c0c9f-8735-42ae-a1d1-d3b952debf11}</Project>
       <Name>HashtagGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NaiveHashtag\NaiveHashtag.csproj">
+      <Project>{B840F832-A00A-42C3-9C6C-3E0D7943836E}</Project>
+      <Name>NaiveHashtag</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shared\Shared.csproj">
       <Project>{058821b0-1615-4a9e-9d0e-396f3cb7b231}</Project>
