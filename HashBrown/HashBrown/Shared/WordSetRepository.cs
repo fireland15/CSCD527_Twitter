@@ -158,5 +158,10 @@ namespace Shared
         {
             return $"{_wordSetBaseName}_{n}";
         }
+
+        public void AddTweet()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

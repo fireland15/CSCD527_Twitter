@@ -26,24 +26,41 @@ namespace HashtagGenerator
         {
             List<IOrderedEnumerable<string>> twoItemSets = new List<IOrderedEnumerable<string>>();
 
-            string sql = string.Empty;
+            string sql = BuildTwoItemSetQuery(words.Count);
 
-            // Build some sql
+            Console.WriteLine(sql);
 
-            using(NpgsqlCommand command = new NpgsqlCommand(sql, _connection))
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
-                using (NpgsqlDataReader rdr = command.ExecuteReader())
+                using (NpgsqlCommand command = _connection.CreateCommand())
                 {
-                    while (rdr.Read())
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    for (int i = 1; i <= words.Count; i++)
                     {
-                        List<string> twoItemSet = new List<string>();
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    }
 
-                        for (int i = 0; i < rdr.FieldCount; i++)
+                    for (int i = 0; i < words.Count; i++)
+                    {
+                        command.Parameters[i].Value = words[i];
+                    }
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
                         {
-                            twoItemSet.Add((string)rdr[i]);
-                        }
+                            List<string> twoItemSet = new List<string>();
 
-                        twoItemSets.Add(twoItemSet.OrderBy(word => word));
+                            for (int i = 0; i < rdr.FieldCount; i++)
+                            {
+                                twoItemSet.Add((string)rdr[i]);
+                            }
+
+                            twoItemSets.Add(twoItemSet.OrderBy(word => word));
+                        }
                     }
                 }
             }
@@ -53,22 +70,150 @@ namespace HashtagGenerator
 
         public int GetCountDouble(string word1, string word2)
         {
-            throw new NotImplementedException();
+            int wordCount = 0;
+
+            string sql = "SELECT count FROM word_set_2_1_day WHERE word1 IN (@word1, @word2) AND word2 IN (@word1, @word2);";
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    command.Parameters.Add(new NpgsqlParameter("@word1", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    command.Parameters.Add(new NpgsqlParameter("@word2", NpgsqlTypes.NpgsqlDbType.Varchar));
+
+                    command.Parameters[0].Value = word1;
+                    command.Parameters[1].Value = word2;
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            wordCount = Int32.Parse(rdr[0].ToString());
+                        }
+                    }
+                }
+            }
+
+            return wordCount;
         }
 
         public int GetCountSingle(string word)
         {
-            throw new NotImplementedException();
+            int wordCount = 0;
+
+            string sql = "SELECT count FROM word_set_1_1_day WHERE word1 = @word1;";
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    command.Parameters.Add(new NpgsqlParameter("@word1", NpgsqlTypes.NpgsqlDbType.Varchar));
+
+                    command.Parameters[0].Value = word;
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            wordCount = Int32.Parse(rdr[0].ToString());
+                        }
+                    }
+                }
+            }
+
+            return wordCount;
         }
 
         public int GetCountTriple(string word1, string word2, string word3)
         {
-            throw new NotImplementedException();
+            var wordList = new List<string>
+            {
+                word1,
+                word2,
+                word3
+            }.OrderBy(word => word).ToList();
+            
+
+            int wordCount = 0;
+
+            string sql = "SELECT count FROM word_set_3_1_day WHERE word1 = @word1 AND word2 = @word2 AND word3 = @word3;";
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    command.Parameters.Add(new NpgsqlParameter("@word1", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    command.Parameters.Add(new NpgsqlParameter("@word2", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    command.Parameters.Add(new NpgsqlParameter("@word3", NpgsqlTypes.NpgsqlDbType.Varchar));
+
+                    command.Parameters[0].Value = wordList[0];
+                    command.Parameters[1].Value = wordList[1];
+                    command.Parameters[2].Value = wordList[2];
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            wordCount = Int32.Parse(rdr[0].ToString());
+                        }
+                    }
+                }
+            }
+
+            return wordCount;
         }
 
         public int GetTotal()
         {
-            throw new NotImplementedException();
+            int tweetCount = 0;
+
+            string sql = "SELECT * FROM tweet_count_1_day;";
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            tweetCount = Int32.Parse(rdr[0].ToString());
+                        }
+                    }
+                }
+            }
+
+            return tweetCount;
+        }
+
+        private string BuildTwoItemSetQuery(int wordCount)
+        {
+            StringBuilder paramBuilder = new StringBuilder();
+            paramBuilder.Append("(");
+            for (int i = 1; i < wordCount; i++)
+            {
+                paramBuilder.Append($"@word{i}, ");
+            }
+            paramBuilder.Append($"@word{wordCount})");
+            string paramList = paramBuilder.ToString();
+
+            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList};";
         }
     }
 }

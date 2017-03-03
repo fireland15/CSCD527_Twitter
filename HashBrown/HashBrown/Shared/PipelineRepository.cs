@@ -133,6 +133,35 @@ namespace Shared
             }
         }
 
+        public void AddTweet()
+        {
+            string sql = "INSERT INTO tweets (tweetid) VALUES (@tweetid);";
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = sql;
+
+                    command.Parameters.Add(new NpgsqlParameter("@tweetid", DbType.Guid));
+
+                    command.Parameters[0].Value = Guid.NewGuid();
+
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
         private string GetInsertIntoSQL(uint n)
         {
             StringBuilder sb = new StringBuilder();

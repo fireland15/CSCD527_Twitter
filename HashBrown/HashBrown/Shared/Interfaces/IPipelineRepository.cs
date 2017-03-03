@@ -8,5 +8,7 @@ namespace Shared
         void InsertMany(IEnumerable<WordHashtagPair> pairs);
 
         void InsertNTuple(string[] tupleOfWords);
+
+        void AddTweet();
     }
 }

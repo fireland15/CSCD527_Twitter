@@ -18,6 +18,11 @@ namespace Shared
             _postgreRepo = postgreRepo;
         }
 
+        public void AddTweet()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Insert(WordHashtagPair pair)
         {
             _pipelineRepo.Insert(pair);

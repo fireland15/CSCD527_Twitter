@@ -160,6 +160,15 @@ namespace StreamProcessor
             {
                 Console.WriteLine(ex.Message);
             }
+
+            try
+            {
+                _repo.AddTweet();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void PersistWordHashPairs(ICollection<WordHashtagPair> wordHashPairs)
