@@ -23,7 +23,7 @@ namespace HashtagGenerator
         }
 
         //An itemset should have a count greater than or equal to the frequencyThreshold if returned
-        public List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold)
+        public List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold, int maxResults)
         {
             List<IOrderedEnumerable<string>> twoItemSets = new List<IOrderedEnumerable<string>>();
 
@@ -45,6 +45,7 @@ namespace HashtagGenerator
                     }
 
                     command.Parameters.Add(new NpgsqlParameter("@frequency", NpgsqlTypes.NpgsqlDbType.Bigint));
+                    command.Parameters.Add(new NpgsqlParameter("@maxResults", NpgsqlTypes.NpgsqlDbType.Integer));
 
                     for (int i = 0; i < words.Count; i++)
                     {
@@ -52,6 +53,7 @@ namespace HashtagGenerator
                     }
 
                     command.Parameters[words.Count].Value = frequencyThreshold;
+                    command.Parameters[words.Count + 1].Value = maxResults;
 
                     using (NpgsqlDataReader rdr = command.ExecuteReader())
                     {
@@ -71,6 +73,18 @@ namespace HashtagGenerator
             }
 
             return twoItemSets;
+        }
+
+        public IEnumerable<Tuple<string, string, string, int>> GetCountTripleMany(IEnumerable<IOrderedEnumerable<string>> threeItemSets)
+        {
+
+
+            return null;
+        }
+
+        string BuildTripleQuery(int count)
+        {
+            return string.Empty;
         }
 
         public int GetCountDouble(string word1, string word2)
@@ -218,7 +232,7 @@ namespace HashtagGenerator
             paramBuilder.Append($"@word{wordCount})");
             string paramList = paramBuilder.ToString();
 
-            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency;";
+            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency ORDER BY count limit @maxResults;";
         }
     }
 }
