@@ -11,8 +11,8 @@ namespace HashtagGenerator.Interfaces
         string[] CreateHashtagsApriori(string text, int minSupport);
 
         string[] ProcessUserGeneratedText(string text);
-
-        IList<IOrderedEnumerable<string>> UnionSets(IList<string> itemSet, int maxTupleLength);
+        
+        IList<IOrderedEnumerable<string>> UnionSets(IList<IOrderedEnumerable<string>> itemSet, int maxTupleLength);
 
         List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
 

@@ -1,3 +1,4 @@
+using System;
 using HashtagGenerator.Interfaces;
 using StreamProcessor;
 using System.Collections.Generic;
@@ -35,9 +36,24 @@ namespace HashtagGenerator
             return words;
         }
 
-        public IList<IOrderedEnumerable<string>> UnionSets(IList<string> itemSet, int maxTupleLength)
+        public IList<IOrderedEnumerable<string>> UnionSets(IList<IOrderedEnumerable<string>> itemSet, int maxTupleLength)
         {
-            return itemSet.Count == 0 ? null : itemSet.Combinations(maxTupleLength).Select(set => set.OrderBy(s => s)).ToList();
+            if (itemSet.Count == 0)
+            {
+                return null;
+            }
+            var list = new List<IOrderedEnumerable<string>>();
+            foreach (var set in itemSet)
+            {
+                list.Add(null);
+
+                var combos = set.Combinations(maxTupleLength).Select(st => st.OrderBy(s => s)).ToList();
+                foreach (var combo in combos)
+                {
+                    list.Add(combo);
+                }
+            }
+            return list ;
         }
 
         public List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules)
@@ -179,22 +195,23 @@ namespace HashtagGenerator
                 }
             }
 
-            var candidatePairs = _repository.GetAll2ItemSets(frequentItemsL1);
-            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
+            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
 
-            foreach (var wordset in candidatePairs)
-            {
-                var count = _repository.GetCountDouble(wordset.ToList()[0], wordset.ToList()[1]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 2 n wordsets
-                if (count >= minSupport)
-                {
-                    frequentItemsL2.Add(wordset);
-                }
-            }
+//            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
+//            foreach (var wordset in candidatePairs)
+//            {
+//                var count = _repository.GetCountDouble(wordset.ToList()[0], wordset.ToList()[1]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 2 n wordsets
+//                   Console.Write(count);
+//                if (count >= minSupport)
+//                {
+//                    frequentItemsL2.Add(wordset);
+//                }
+//            }
 
-           // candidatePairs = UnionSets(frequentItemsL1, 3);
+            var candidateTriples = UnionSets(frequentItemsL2, 3);
             var frequentItemsL3 = new List<IOrderedEnumerable<string>>();
 
-            foreach (var wordset in candidatePairs)
+            foreach (var wordset in candidateTriples)
             {
                 var count = _repository.GetCountTriple(wordset.ToList()[0], wordset.ToList()[1], wordset.ToList()[2]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 3 n word sets
                 if (count >= minSupport)

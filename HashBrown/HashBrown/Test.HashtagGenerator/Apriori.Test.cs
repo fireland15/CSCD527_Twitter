@@ -33,32 +33,32 @@ namespace Test.HashtagGenerator
             Assert.AreEqual(result[5], "tweet");
         }
 
-        [TestMethod]
-        public void UnionSetsTest_2Items()
-        {
-            var set = new List<string> {"banana", "apple", "potato"};
-            var sut = new Apriori(null);
-            
-            var result = sut.UnionSets(set, 2);
-
-            Assert.AreEqual(result[0].ElementAt(0) , "apple");
-            Assert.AreEqual(result[0].ElementAt(1), "banana");
-            Assert.AreEqual(result[1].ElementAt(0), "banana");
-            Assert.AreEqual(result[1].ElementAt(1), "potato");
-            Assert.AreEqual(result[2].ElementAt(0), "apple");
-            Assert.AreEqual(result[2].ElementAt(1), "potato");   
-        }
-
-        [TestMethod]
-        public void UnionSetsTest_3Items()
-        {
-            var set = new List<string> { "banana", "apple", "potato", "grape" };
-            var sut = new Apriori(null);
-
-            var results = sut.UnionSets(set, 3);
-
-            Assert.AreEqual(results.Count, 4);
-        }
+//        [TestMethod]
+//        public void UnionSetsTest_2Items()
+//        {
+//            var set = new List<string> {"banana", "apple", "potato"};
+//            var sut = new Apriori(null);
+//            
+//            var result = sut.UnionSets(set, 2);
+//
+//            Assert.AreEqual(result[0].ElementAt(0) , "apple");
+//            Assert.AreEqual(result[0].ElementAt(1), "banana");
+//            Assert.AreEqual(result[1].ElementAt(0), "banana");
+//            Assert.AreEqual(result[1].ElementAt(1), "potato");
+//            Assert.AreEqual(result[2].ElementAt(0), "apple");
+//            Assert.AreEqual(result[2].ElementAt(1), "potato");   
+//        }
+//
+//        [TestMethod]
+//        public void UnionSetsTest_3Items()
+//        {
+//            var set = new List<string> { "banana", "apple", "potato", "grape" };
+//            var sut = new Apriori(null);
+//
+//            var results = sut.UnionSets(set, 3);
+//
+//            Assert.AreEqual(results.Count, 4);
+//        }
 
         [TestMethod]
         public void GenerateAssociationRules()

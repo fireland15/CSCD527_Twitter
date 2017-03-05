@@ -18,55 +18,61 @@ namespace HashBrownConsole
             string connectionString = ConfigurationManager.AppSettings["connectionString"].ToString();
 
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
-            {
-                //IAprioriRepository repo = new AprioriRepository(con);
+            {                
+                IAprioriRepository repo = new AprioriRepository(con);
 
-                //// Test get all two item sets
-                ////var twoItemSets = repo.GetAll2ItemSets(new List<string>
-                ////{
-                //    //"trump",
-                //    //"wall",
-                //    //"potus"
-                ////});
+				var Apriori = new Apriori(repo);
 
-                ////foreach (var twoItemSet in twoItemSets)
-                ////{
-                ////    var listOfWords = twoItemSet.ToList();
-                ////    foreach (var word in listOfWords)
-                ////    {
-                ////        Console.Write(word);
-                ////        Console.Write(" ");
-                ////    }
-                ////
-                ////    Console.WriteLine();
-                ////}
+                var tweet = new string[] {"trump"};
+                var stuff = Apriori.GenerateAssociationRules(tweet, 25, .01, .01);
+                Console.Write(stuff);
 
-                //// Test getting count of a specific word
-                //int bananaCount = repo.GetCountSingle("banana");
-                //Console.WriteLine(bananaCount);
-
-                //// Test getting count of a two words only
-                //int trumpWallCount = repo.GetCountDouble("wall", "trump");
-                //Console.WriteLine(trumpWallCount);
-
-                //// Test getting count of three words only
-                //int trumpWallCountPotus = repo.GetCountTriple("7foot", "trump", "wall");
-                // Console.WriteLine(trumpWallCountPotus);
-
-                //// Test getting count of three words only
-                //int tweetCount = repo.GetTotal();
-                //Console.WriteLine(tweetCount);
-                
-                
-                INaiveRepository naiveRepo = new NaiveRepository(con);
-                Naive naive = new Naive(naiveRepo);
-
-                var hashtags = naive.getHashtags(new string[] { "elon", "musk" }, 40);
-                foreach (var tag in hashtags)
-                {
-                    Console.WriteLine(tag);
-                }
-                
+//
+//                // Test get all two item sets
+//                var twoItemSets = repo.GetAll2ItemSets(new List<string>
+//                {
+//                    "trump",
+//                    "wall",
+//                    "potus"
+//                });
+//
+//                foreach (var twoItemSet in twoItemSets)
+//                {
+//                    var listOfWords = twoItemSet.ToList();
+//                    foreach (var word in listOfWords)
+//                    {
+//                        Console.Write(word);
+//                        Console.Write(" ");
+//                    }
+//
+//                    Console.WriteLine();
+//                }
+//
+//                // Test getting count of a specific word
+//                int bananaCount = repo.GetCountSingle("banana");
+//                Console.WriteLine(bananaCount);
+//
+//                // Test getting count of a two words only
+//                int trumpWallCount = repo.GetCountDouble("wall", "trump");
+//                Console.WriteLine(trumpWallCount);
+//
+//                // Test getting count of three words only
+//                int trumpWallCountPotus = repo.GetCountTriple("wall", "trump", "banana");
+//                Console.WriteLine(trumpWallCountPotus);
+//
+//                // Test getting count of three words only
+//                int tweetCount = repo.GetTotal();
+//                Console.WriteLine(tweetCount);
+//                
+//
+//                INaiveRepository naiveRepo = new NaiveRepository(con);
+//                Naive naive = new Naive(naiveRepo);
+//
+//                var hashtags = naive.getHashtags(new string[] { "trump" }, 20);
+//                foreach (var tag in hashtags)
+//                {
+//                    Console.WriteLine(tag);
+//                }
             }
         }
     }
