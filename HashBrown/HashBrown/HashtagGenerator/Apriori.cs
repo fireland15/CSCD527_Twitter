@@ -1,3 +1,4 @@
+using System;
 using HashtagGenerator.Interfaces;
 using StreamProcessor;
 using System.Collections.Generic;
@@ -194,17 +195,18 @@ namespace HashtagGenerator
                 }
             }
 
-            var candidatePairs = _repository.GetAll2ItemSets(frequentItemsL1);
-            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
+            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
 
-            foreach (var wordset in candidatePairs)
-            {
-                var count = _repository.GetCountDouble(wordset.ToList()[0], wordset.ToList()[1]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 2 n wordsets
-                if (count >= minSupport)
-                {
-                    frequentItemsL2.Add(wordset);
-                }
-            }
+//            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
+//            foreach (var wordset in candidatePairs)
+//            {
+//                var count = _repository.GetCountDouble(wordset.ToList()[0], wordset.ToList()[1]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 2 n wordsets
+//                   Console.Write(count);
+//                if (count >= minSupport)
+//                {
+//                    frequentItemsL2.Add(wordset);
+//                }
+//            }
 
             var candidateTriples = UnionSets(frequentItemsL2, 3);
             var frequentItemsL3 = new List<IOrderedEnumerable<string>>();

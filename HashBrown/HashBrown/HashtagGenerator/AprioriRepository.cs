@@ -22,7 +22,8 @@ namespace HashtagGenerator
             }
         }
 
-        public List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words)
+        //An itemset should have a count greater than or equal to the frequencyThreshold if returned
+        public List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold)
         {
             List<IOrderedEnumerable<string>> twoItemSets = new List<IOrderedEnumerable<string>>();
 

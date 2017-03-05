@@ -41,6 +41,6 @@ namespace Shared.Interfaces
         /// </summary>
         /// <param name="words"></param>
         /// <returns></returns>
-        List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words);
+        List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold);
     }
 }
