@@ -72,7 +72,7 @@ namespace HashtagGenerator
         {
             int wordCount = 0;
 
-            string sql = "SELECT count FROM word_set_2_1_day WHERE word1 IN (@word1, @word2) AND word2 IN (@word1, @word2);";
+            string sql = "SELECT count FROM word_set_2_1_day WHERE word1 = @word1 OR word2 = @word2 OR word1 = @word2 OR word2 = @word1;";
 
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
