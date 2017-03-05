@@ -44,10 +44,14 @@ namespace HashtagGenerator
                         command.Parameters.Add(new NpgsqlParameter($"@word{i}", NpgsqlTypes.NpgsqlDbType.Varchar));
                     }
 
+                    command.Parameters.Add(new NpgsqlParameter("@frequency", NpgsqlTypes.NpgsqlDbType.Bigint));
+
                     for (int i = 0; i < words.Count; i++)
                     {
                         command.Parameters[i].Value = words[i];
                     }
+
+                    command.Parameters[words.Count].Value = frequencyThreshold;
 
                     using (NpgsqlDataReader rdr = command.ExecuteReader())
                     {
@@ -205,7 +209,16 @@ namespace HashtagGenerator
 
         private string BuildTwoItemSetQuery(int wordCount)
         {
-            return "SELECT word1, word2 FROM word_set_2_1_day WHERE word1 = @word1 OR word2 = @word2 OR word1 = @word2 OR word2 = @word1;";
+            StringBuilder paramBuilder = new StringBuilder();
+            paramBuilder.Append("(");
+            for (int i = 1; i < wordCount; i++)
+            {
+                paramBuilder.Append($"@word{i}, ");
+            }
+            paramBuilder.Append($"@word{wordCount})");
+            string paramList = paramBuilder.ToString();
+
+            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency;";
         }
     }
 }
