@@ -24,8 +24,8 @@ namespace HashBrownConsole
 
                var Apriori = new Apriori(repo);
 
-                var tweet = new string[] {"trump"};
-                var stuff = Apriori.GenerateAssociationRules(tweet, 25, .01, .01);
+                var tweet = new string[] {"potato"};
+                var stuff = Apriori.GenerateAssociationRules(tweet, 3, .1, .1);
                 Console.Write(stuff);
 
 //

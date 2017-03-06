@@ -42,18 +42,14 @@ namespace HashtagGenerator
             {
                 return null;
             }
-            var list = new List<IOrderedEnumerable<string>>();
-            foreach (var set in itemSet)
-            {
-                list.Add(null);
 
-                var combos = set.Combinations(maxTupleLength).Select(st => st.OrderBy(s => s)).ToList();
-                foreach (var combo in combos)
-                {
-                    list.Add(combo);
-                }
-            }
-            return list ;
+           var test = itemSet.ToArray();
+
+            var list = new List<IOrderedEnumerable<string>>();
+
+                //var combos = itemset.Combinations(maxTupleLength).Select(st => st.OrderBy(s => s)).ToList();
+      
+            return new List<IOrderedEnumerable<string>>();
         }
 
         public List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules)
@@ -63,7 +59,7 @@ namespace HashtagGenerator
 
             var associationRulesList = new List<string>();
 
-            var total = _repository.GetTotal();
+            var total = 50;//_repository.GetTotal();
 
             foreach (var itemset in frequentItemSets)
             {
@@ -72,6 +68,7 @@ namespace HashtagGenerator
                 {
                     //2 n itemsets
                     case 1:
+                        Console.Write(itemList[0] + "\n");
                         associationRulesList.AddRange(CalculateAssociationRulesFor2ItemSets(itemList, minSupportRules, minConfidenceRules, total));
                         break;
 
@@ -195,8 +192,17 @@ namespace HashtagGenerator
                 }
             }
 
-            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
+            if (frequentItemsL1.Count == 0)
+            {
+                throw new System.ArgumentException("Tweet is not popular enough for Apriori Analysis");
+            }
 
+            var frequentItemsL2= _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
+
+            if (frequentItemsL2.Count == 0)
+            {
+                throw new System.ArgumentException("Tweet is not popular enough for Apriori Analysis");
+            }
 //            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
 //            foreach (var wordset in candidatePairs)
 //            {
