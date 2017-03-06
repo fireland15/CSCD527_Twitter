@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Shared.Interfaces
@@ -30,6 +31,8 @@ namespace Shared.Interfaces
        /// <returns></returns>
         int GetCountTriple(string word1, string word2, string word3);
 
+        IEnumerable<Tuple<string, string, string, int>> GetCountTripleMany(IEnumerable<IOrderedEnumerable<string>> threeItemSets);
+
         /// <summary>
         /// Get the total count of transactions in the database (The number of tweets)
         /// </summary>
@@ -41,6 +44,6 @@ namespace Shared.Interfaces
         /// </summary>
         /// <param name="words"></param>
         /// <returns></returns>
-        List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold);
+        List<IOrderedEnumerable<string>> GetAll2ItemSets(IList<string> words, int frequencyThreshold, int maxResults);
     }
 }

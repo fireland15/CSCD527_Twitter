@@ -33,7 +33,7 @@ namespace Shared
         /// <returns></returns>
         private ICollection<string> SplitText(string text)
         {
-            return text.Split(" .,/!@$%^&*()\\:;\"'<>?".ToCharArray())
+            return text.ToLower().Split(" .,/!@$%^&*()\\:;\"'<>?".ToCharArray())
                 .Where(s => s.Length != 0)
                 .Select(s => s.ToLower())
                 .ToList();

@@ -38,18 +38,20 @@ namespace HashtagGenerator
 
         public IList<IOrderedEnumerable<string>> UnionSets(IList<IOrderedEnumerable<string>> itemSet, int maxTupleLength)
         {
-            if (itemSet.Count == 0)
-            {
-                return null;
-            }
-
-           var test = itemSet.ToArray();
+            var pairs = itemSet.Combinations(2);
 
             var list = new List<IOrderedEnumerable<string>>();
 
-                //var combos = itemset.Combinations(maxTupleLength).Select(st => st.OrderBy(s => s)).ToList();
-      
-            return new List<IOrderedEnumerable<string>>();
+            foreach (var pair in pairs)
+            {
+                var temp = pair.ToList();
+
+                var unioned = temp[0].Union(temp[1]);
+
+                list.Add(unioned.OrderBy(x => x));
+            }
+
+            return list ;
         }
 
         public List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules)
@@ -191,6 +193,7 @@ namespace HashtagGenerator
                     frequentItemsL1.Add(word);
                 }
             }
+<<<<<<< HEAD
 
             if (frequentItemsL1.Count == 0)
             {
@@ -198,6 +201,10 @@ namespace HashtagGenerator
             }
 
             var frequentItemsL2= _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
+=======
+            
+            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport, 20);
+>>>>>>> a772e6e54e0d46f6add027bc9a7f9fd7ac4db9b1
 
             if (frequentItemsL2.Count == 0)
             {

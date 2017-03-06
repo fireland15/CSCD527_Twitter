@@ -57,46 +57,47 @@ namespace NaiveHashtag
         /// <param name="naiveList"></param>
         /// <param name="numberOfHashtags"></param>
         /// <returns></returns>
-        private IEnumerable<HashtagAndCount> Score(NaiveList naiveList, int numberOfHashtags)
+        private ICollection<HashtagAndCount> Score(NaiveList naiveList, int numberOfHashtags)
         {
-            //int threashold  = 0;
-            //ICollection<HashtagAndCount> collisionList2 = CreateCollisionList(naiveList);
+            int threashold  = 0;
+            ICollection<HashtagAndCount> collisionList = CreateCollisionList(naiveList);
 
             // group by hashtag and sum the counts for each one
-            IEnumerable<HashtagAndCount> collisionList = naiveList.Words
-                .SelectMany(x => x.Hashtags)
-                .GroupBy(x => x.Hashtag)
-                .Select(x => new HashtagAndCount
-                {
-                    Hashtag = x.Key,
-                    Count = x.Sum(y => y.Count)
-                });
+            //IEnumerable<HashtagAndCount> collisionList = naiveList.Words
+            //    .SelectMany(x => x.Hashtags)
+            //    .GroupBy(x => x.Hashtag)
+            //    .Select(x => new HashtagAndCount
+            //    {
+            //        Hashtag = x.Key,
+            //        Count = x.Sum(y => y.Count)
+            //    });
 
 
-            IEnumerable<HashtagAndCount> rankedHashtags = collisionList.OrderByDescending(x => x.Count).Take(numberOfHashtags);
+            //IEnumerable<HashtagAndCount> rankedHashtags = collisionList.OrderByDescending(x => x.Count).Take(numberOfHashtags);
 
-            /*
-            while (collisionList.Count() > numberOfHashtags)
-            {
-                ICollection<HashtagAndCount> newList = new List<HashtagAndCount>();
-                foreach(HashtagAndCount tag in collisionList)
-                {
-                    // filter hashtags if they don't meet a threshold count
-                    if(tag.Count > threashold)
-                    {
-                        newList.Add(tag);     
-                    }
-                }
-                collisionList = newList;
 
-                // increase threshold until the collisiong list is large enough
-                threashold++;
-            }
-            ICollection<HashtagAndCount> listWithCount = RecreateCount(naiveList, collisionList);
+            // "chop" off the hashtags with the lowest count to meet a threshold
+            var topCollisionList = collisionList.Take(numberOfHashtags);
+            //while (collisionList.Count() > numberOfHashtags)
+            //{
+            //    ICollection<HashtagAndCount> newList = new List<HashtagAndCount>();
+            //    foreach(HashtagAndCount tag in collisionList)
+            //    {
+            //        // filter hashtags if they don't meet a threshold count
+            //        if(tag.Count > threashold)
+            //        {
+            //            newList.Add(tag);     
+            //        }
+            //    }
+            //    collisionList = newList;
+
+            //    // increase threshold until the collisiong list is large enough
+            //    threashold++;
+            //}
+
+            ICollection<HashtagAndCount> listWithCount = RecreateCount(naiveList, topCollisionList.ToList());
+
             return listWithCount.OrderBy(tag => tag.Count).ToList();
-            */
-
-            return rankedHashtags;
         }
 
 
@@ -106,7 +107,7 @@ namespace NaiveHashtag
         /// <param name="naiveList"></param>
         /// <param name="collisionList"></param>
         /// <returns></returns>
-        private IEnumerable<HashtagAndCount> RecreateCount(NaiveList naiveList, IEnumerable<HashtagAndCount> collisionList)
+        private ICollection<HashtagAndCount> RecreateCount(NaiveList naiveList, ICollection<HashtagAndCount> collisionList)
         {
             foreach (HashtagAndCount tag in collisionList)
             {

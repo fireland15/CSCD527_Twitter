@@ -18,12 +18,10 @@ namespace HashBrownConsole
             string connectionString = ConfigurationManager.AppSettings["connectionString"].ToString();
 
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
-            {
-                
+            {                
                 IAprioriRepository repo = new AprioriRepository(con);
 
-               var Apriori = new Apriori(repo);
-
+				var Apriori = new Apriori(repo);
                 var tweet = new string[] {"potato"};
                 var stuff = Apriori.GenerateAssociationRules(tweet, 3, .1, .1);
                 Console.Write(stuff);
