@@ -289,7 +289,7 @@ namespace HashtagGenerator
             paramBuilder.Append($"@word{wordCount})");
             string paramList = paramBuilder.ToString();
 
-            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency ORDER BY count limit @maxResults;";
+            return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency ORDER BY DESC count limit @maxResults;";
         }
     }
 }
