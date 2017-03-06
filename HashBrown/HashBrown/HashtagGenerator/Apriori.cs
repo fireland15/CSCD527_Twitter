@@ -193,18 +193,13 @@ namespace HashtagGenerator
                     frequentItemsL1.Add(word);
                 }
             }
-<<<<<<< HEAD
 
             if (frequentItemsL1.Count == 0)
             {
                 throw new System.ArgumentException("Tweet is not popular enough for Apriori Analysis");
             }
-
-            var frequentItemsL2= _repository.GetAll2ItemSets(frequentItemsL1, minSupport);
-=======
             
             var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport, 20);
->>>>>>> a772e6e54e0d46f6add027bc9a7f9fd7ac4db9b1
 
             if (frequentItemsL2.Count == 0)
             {
