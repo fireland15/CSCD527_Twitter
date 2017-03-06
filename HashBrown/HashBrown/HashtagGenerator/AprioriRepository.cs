@@ -77,14 +77,71 @@ namespace HashtagGenerator
 
         public IEnumerable<Tuple<string, string, string, int>> GetCountTripleMany(IEnumerable<IOrderedEnumerable<string>> threeItemSets)
         {
+            int count = threeItemSets.Count();
 
+            string sql = BuildTripleQuery(threeItemSets.Count());
 
-            return null;
+            Console.WriteLine(sql);
+
+            List<Tuple<string, string, string, int>> results = new List<Tuple<string, string, string, int>>();
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}_1", NpgsqlTypes.NpgsqlDbType.Varchar));
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}_2", NpgsqlTypes.NpgsqlDbType.Varchar));
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}_3", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    }
+
+                    int j = 0;
+                    foreach (var itemSet in threeItemSets)
+                    {
+                        var list = itemSet.ToList();
+                        command.Parameters[j++].Value = list[0];
+                        command.Parameters[j++].Value = list[1];
+                        command.Parameters[j++].Value = list[2];
+                    }
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            string word1 = rdr[0].ToString();
+                            string word2 = rdr[1].ToString();
+                            string word3 = rdr[2].ToString();
+                            int tupleCount = Int32.Parse(rdr[3].ToString());
+
+                            var tuple = new Tuple<string, string, string, int>(word1, word2, word3, tupleCount);
+                            results.Add(tuple);
+                        }
+                    }
+                }
+            }
+
+            return results;
         }
 
         string BuildTripleQuery(int count)
         {
-            return string.Empty;
+            StringBuilder b = new StringBuilder();
+
+            b.Append("SELECT word1, word2, word3, count FROM word_set_3_1_day WHERE ");
+
+            for (int i = 0; i < count - 1; i++)
+            {
+                b.Append($"(word1 = @word{i}_1 AND word2 = @word{i}_2 AND word3 = @word{i}_3) OR ");
+            }
+
+            b.Append($"(word1 = @word{count - 1}_1 AND word2 = @word{count - 1}_2 AND word3 = @word{count - 1}_3);");
+
+            return b.ToString();
         }
 
         public int GetCountDouble(string word1, string word2)

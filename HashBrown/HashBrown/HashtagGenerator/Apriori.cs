@@ -82,6 +82,9 @@ namespace HashtagGenerator
             return associationRulesList;
         }
 
+        //called once for each itemset generated
+        // 2 calls to getcountsingle
+        // 1 call to getcountdouble
         public List<string> CalculateAssociationRulesFor2ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total)
         {
 
@@ -117,6 +120,10 @@ namespace HashtagGenerator
             return associationRulesList;
         }
 
+        //called once per itemset generated
+        // 1 call to get count triple
+        // 3 calls to get count single
+        // 3 calls to get count double
         public List<string> CalculateAssociationRulesFor3ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total)
         {
             var associationRulesList = new List<string>();
@@ -181,6 +188,7 @@ namespace HashtagGenerator
             return associationRulesList;
         }
 
+        //one call
         public IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words, int minSupport)
         {
             IList<string> frequentItemsL1 = new List<string>();
@@ -208,15 +216,16 @@ namespace HashtagGenerator
 
             var candidateTriples = UnionSets(frequentItemsL2, 3);
             var frequentItemsL3 = new List<IOrderedEnumerable<string>>();
+            var lsit = _repository.GetCountTripleMany(candidateTriples);
 
-            foreach (var wordset in candidateTriples)
-            {
-                var count = _repository.GetCountTriple(wordset.ToList()[0], wordset.ToList()[1], wordset.ToList()[2]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 3 n word sets
-                if (count >= minSupport)
-                {
-                    frequentItemsL3.Add(wordset);
-                }
-            }
+            //foreach (var wordset in candidateTriples)
+            //{
+            //    var count = _repository.GetCountTriple(wordset.ToList()[0], wordset.ToList()[1], wordset.ToList()[2]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 3 n word sets
+            //    if (count >= minSupport)
+            //    {
+            //        frequentItemsL3.Add(wordset);
+            //    }
+            //}
             return frequentItemsL2.Union(frequentItemsL3);
         }
     }
