@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Apriori.cs" />
     <Compile Include="AprioriRepository.cs" />
+    <Compile Include="CachedAprioriRepository.cs" />
     <Compile Include="Interfaces\IApriori.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -75,6 +75,55 @@ namespace HashtagGenerator
             return twoItemSets;
         }
 
+        public IEnumerable<Tuple<string, string, int>> GetAll2ItemSetsWithCounts(IList<string> words, int frequencyThreshold, int maxResults)
+        {
+            List<Tuple<string, string, int>> twoItemSets = new List<Tuple<string, string, int>>();
+
+            string sql = BuildTwoItemSetQueryWithCount(words.Count);
+
+            Console.WriteLine(sql);
+
+            using (NpgsqlTransaction transaction = _connection.BeginTransaction())
+            {
+                using (NpgsqlCommand command = _connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandText = sql;
+
+                    for (int i = 1; i <= words.Count; i++)
+                    {
+                        command.Parameters.Add(new NpgsqlParameter($"@word{i}", NpgsqlTypes.NpgsqlDbType.Varchar));
+                    }
+
+                    command.Parameters.Add(new NpgsqlParameter("@frequency", NpgsqlTypes.NpgsqlDbType.Bigint));
+                    command.Parameters.Add(new NpgsqlParameter("@maxResults", NpgsqlTypes.NpgsqlDbType.Integer));
+
+                    for (int i = 0; i < words.Count; i++)
+                    {
+                        command.Parameters[i].Value = words[i];
+                    }
+
+                    command.Parameters[words.Count].Value = frequencyThreshold;
+                    command.Parameters[words.Count + 1].Value = maxResults;
+
+                    using (NpgsqlDataReader rdr = command.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            string word1 = rdr[0].ToString();
+                            string word2 = rdr[1].ToString();
+                            int count = Int32.Parse(rdr[2].ToString());
+
+                            twoItemSets.Add(new Tuple<string, string, int>(word1, word2, count));
+                        }
+                    }
+                }
+            }
+
+            return twoItemSets;
+        }
+
         public IEnumerable<Tuple<string, string, string, int>> GetCountTripleMany(IEnumerable<IOrderedEnumerable<string>> threeItemSets)
         {
             int count = threeItemSets.Count();
@@ -290,6 +339,20 @@ namespace HashtagGenerator
             string paramList = paramBuilder.ToString();
 
             return $"SELECT word1, word2 FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency ORDER BY DESC count limit @maxResults;";
+        }
+
+        private string BuildTwoItemSetQueryWithCount(int wordCount)
+        {
+            StringBuilder paramBuilder = new StringBuilder();
+            paramBuilder.Append("(");
+            for (int i = 1; i < wordCount; i++)
+            {
+                paramBuilder.Append($"@word{i}, ");
+            }
+            paramBuilder.Append($"@word{wordCount})");
+            string paramList = paramBuilder.ToString();
+
+            return $"SELECT word1, word2, count FROM word_set_2_1_day WHERE word1 IN {paramList} OR word{2} IN {paramList} AND count > @frequency ORDER BY DESC count limit @maxResults;";
         }
     }
 }
