@@ -215,8 +215,14 @@ namespace HashtagGenerator
 //            }
 
             var candidateTriples = UnionSets(frequentItemsL2, 3);
-            var frequentItemsL3 = new List<IOrderedEnumerable<string>>();
-            var lsit = _repository.GetCountTripleMany(candidateTriples);
+            var frequentItemsL3 = _repository
+                .GetCountTripleMany(candidateTriples)
+                .Select(x => new List<string>
+                {
+                    x.Item1,
+                    x.Item2,
+                    x.Item3
+                }.OrderBy(y => y));
 
             //foreach (var wordset in candidateTriples)
             //{

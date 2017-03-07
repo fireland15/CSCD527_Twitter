@@ -3,8 +3,6 @@ using Shared.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HashtagGenerator
 {
@@ -12,7 +10,11 @@ namespace HashtagGenerator
     {
         private readonly AprioriRepository _repo;
 
+        private readonly IDictionary<string, int> _singleWordCounts = new Dictionary<string, int>();
+
         private readonly IDictionary<Tuple<string, string>, int> _doubleWordCounts = new Dictionary<Tuple<string, string>, int>();
+
+        private readonly IDictionary<Tuple<string, string, string>, int> _tripleWordCounts = new Dictionary<Tuple<string, string, string>, int>();
 
         public CachedAprioriRepository(NpgsqlConnection connection)
         {
@@ -64,22 +66,78 @@ namespace HashtagGenerator
 
         public int GetCountSingle(string word)
         {
-            throw new NotImplementedException();
+            if (_singleWordCounts.ContainsKey(word))
+            {
+                return _singleWordCounts[word];
+            }
+            else
+            {
+                int count = _repo.GetCountSingle(word);
+                _singleWordCounts.Add(word, count);
+                return count;
+            }
         }
 
         public int GetCountTriple(string word1, string word2, string word3)
         {
-            throw new NotImplementedException();
+            List<string> words = new List<string>
+            {
+                word1,
+                word2,
+                word3
+            }.OrderBy(x => x).ToList();
+
+            var key = new Tuple<string, string, string>(words[0], words[1], words[2]);
+
+            if (_tripleWordCounts.ContainsKey(key))
+            {
+                return _tripleWordCounts[key];
+            }
+            else
+            {
+                int count = _repo.GetCountTriple(words[0], words[1], words[2]);
+                _tripleWordCounts.Add(key, count);
+                return count;
+            }
         }
 
         public IEnumerable<Tuple<string, string, string, int>> GetCountTripleMany(IEnumerable<IOrderedEnumerable<string>> threeItemSets)
         {
-            throw new NotImplementedException();
+            List<Tuple<string, string, string, int>> results = new List<Tuple<string, string, string, int>>();
+            List<IOrderedEnumerable<string>> needToQueryFor = new List<IOrderedEnumerable<string>>();
+
+            foreach (var set in threeItemSets)
+            {
+                var list = set.ToList();
+                var words = new Tuple<string, string, string>(list[0], list[1], list[2]);
+                if (_tripleWordCounts.ContainsKey(words))
+                {
+                    var count = _tripleWordCounts[words];
+                    var tuple = new Tuple<string, string, string, int>(words.Item1, words.Item2, words.Item3, count);
+                    results.Add(tuple);
+                }
+                else
+                {
+                    needToQueryFor.Add(set);
+                }
+            }
+
+            var queryResults = _repo.GetCountTripleMany(needToQueryFor);
+
+            foreach(var queryResult in queryResults)
+            {
+                var key = new Tuple<string, string, string>(queryResult.Item1, queryResult.Item2, queryResult.Item3);
+                _tripleWordCounts.Add(key, queryResult.Item4);
+
+                results.Add(queryResult);
+            }
+
+            return results;
         }
 
         public int GetTotal()
         {
-            throw new NotImplementedException();
+            return _repo.GetTotal();
         }
     }
 }
