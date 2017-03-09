@@ -22,7 +22,7 @@ namespace Test.HashtagGenerator
         public void ProcessUserGeneratedTextTest()
         {
             var text = "This, is my! super Cool Tweet!!!";  
-            var sut = new Apriori(null);
+            var sut = new Apriori(null, null);
             var result = sut.ProcessUserGeneratedText(text);
 
             Assert.AreEqual(result[0], "this");
@@ -69,10 +69,10 @@ namespace Test.HashtagGenerator
         [TestMethod]
         public void GenerateFrequentItemSets()
         {
-            var sut = new Apriori(null);
+            var sut = new Apriori(null, null);
             var test = new string[] {"banana","apple","potato","grape"};
 
-            var result = sut.GenerateFrequentItemSets(test, 1);
+            var result = sut.GenerateFrequentItemSets(test);
         }
 
         [TestMethod]
@@ -83,11 +83,11 @@ namespace Test.HashtagGenerator
             mockrepo.Setup(m => m.GetCountSingle("apple")).Returns(12);
             mockrepo.Setup(m => m.GetCountDouble("apple", "banana")).Returns(12);
 
-            var sut = new Apriori(mockrepo.Object);
+            var sut = new Apriori(mockrepo.Object, null);
 
             var test = new List<string> {"apple", "banana"};
 
-            var result = sut.CalculateAssociationRulesFor2ItemSets(test, 1, 1, 100);
+            var result = sut.CalculateAssociationRulesFor2ItemSets(test, 5);
             //Assert ??????
         }
 
@@ -99,11 +99,11 @@ namespace Test.HashtagGenerator
             mockrepo.Setup(m => m.GetCountSingle("apple")).Returns(20);
             mockrepo.Setup(m => m.GetCountDouble("apple", "banana")).Returns(55);
 
-            var sut = new Apriori(mockrepo.Object);
+            var sut = new Apriori(mockrepo.Object, null);
 
             var test = new List<string> { "apple", "banana" };
 
-            var result = sut.CalculateAssociationRulesFor2ItemSets(test, .5, 2, 100);
+            var result = sut.CalculateAssociationRulesFor2ItemSets(test, 5);
             //Assert ??????
         }
 
