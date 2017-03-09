@@ -65,12 +65,12 @@ namespace HashtagGenerator
             return list ;
         }
 
-        public List<string> GenerateAssociationRules(string[] words)
+        public List<AssociationRule> GenerateAssociationRules(string[] words)
         {
 
             var frequentItemSets = GenerateFrequentItemSets(words);
 
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
 
             var total = _repository.GetTotal();
 
@@ -93,10 +93,10 @@ namespace HashtagGenerator
             return associationRulesList;
         }
         
-        public List<string> CalculateAssociationRulesFor2ItemSets(List<string> itemList, int total)
+        public List<AssociationRule> CalculateAssociationRulesFor2ItemSets(List<string> itemList, int total)
         {
 
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
             int numOfTotalSet = _repository.GetCountDouble(itemList[0], itemList[1]); //database.get(AB)
 
             //calculate support
@@ -114,7 +114,20 @@ namespace HashtagGenerator
             if (confidenceAB >= _options.RuleMinimumConfidence)
             {
                 //add the A->B to the ruleSet
-                associationRulesList.Add(itemList[0] + " => " + itemList[1]);
+                //associationRulesList.Add(itemList[0] + " => " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Confidence = confidenceAB,
+                    Support = support
+                });
             }
 
             //calculate confidence that B->A
@@ -122,15 +135,27 @@ namespace HashtagGenerator
             if (confidenceBA >= _options.RuleMinimumConfidence)
             {
                 //add the B -> A to the ruleSet
-                associationRulesList.Add(itemList[1] + " => " + itemList[0]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Confidence = confidenceAB,
+                    Support = support
+                });
             }
 
             return associationRulesList;
         }
         
-        public List<string> CalculateAssociationRulesFor3ItemSets(List<string> itemList, int total)
+        public List<AssociationRule> CalculateAssociationRulesFor3ItemSets(List<string> itemList, int total)
         {
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
             var numOfTotalSet = _repository.GetCountTriple(itemList[0], itemList[1], itemList[2]); //database.get(ABC)
 
             //calculate support
@@ -138,7 +163,9 @@ namespace HashtagGenerator
             var support = (double)numOfTotalSet / total;
 
             if (support > _options.RuleMinimumSupport) //no need to continue, it doesnt meet support threshold
-            { return associationRulesList; }
+            {
+                return associationRulesList;
+            }
 
 
             //calculate confidence that A->BC
@@ -162,32 +189,110 @@ namespace HashtagGenerator
             if (confidenceAiBC >= _options.RuleMinimumConfidence)
             {
                 //add the A->BC to the ruleSet
-                associationRulesList.Add(itemList[0] + " => " + itemList[1] + " " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1],
+                        itemList[2]
+                    },
+                    Confidence = confidenceAiBC,
+                    Support = support
+                });
             }
             if (confidenceBiAC >= _options.RuleMinimumConfidence)
             {
                 //add the B->AC to the ruleSet
-                associationRulesList.Add(itemList[1] + " => " + itemList[0] + " " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[2]
+                    },
+                    Confidence = confidenceBiAC,
+                    Support = support
+                });
             }
             if (confidenceCiAB >= _options.RuleMinimumConfidence)
             {
                 //add the C->AB to the ruleSet
-                associationRulesList.Add(itemList[2] + " => " + itemList[0] + " " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[1]
+                    },
+                    Confidence = confidenceCiAB,
+                    Support = support
+                });
             }
             if (confidenceABiC >= _options.RuleMinimumConfidence)
             {
                 //add the AB->C to the ruleSet
-                associationRulesList.Add(itemList[0] + " " + itemList[1] + " => " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[2]
+                    },
+                    Confidence = confidenceABiC,
+                    Support = support
+                });
             }
             if (confidenceBCiA >= _options.RuleMinimumConfidence)
             {
                 //add the BC->A to the ruleSet
-                associationRulesList.Add(itemList[1] + " " + itemList[2] + " => " + itemList[0]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1],
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Confidence = confidenceBCiA,
+                    Support = support
+                });
             }
             if (confidenceACiB >= _options.RuleMinimumConfidence)
             {
                 //add the AC->B to the ruleSet
-                associationRulesList.Add(itemList[1] + " " + itemList[2] + " => " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Confidence = confidenceACiB,
+                    Support = support
+                });
             }
             return associationRulesList;
         }
