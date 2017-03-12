@@ -24,5 +24,17 @@ namespace HashtagGenerator
 
             return result;
         }
+
+        public override string ToString()
+        {
+            StringBuilder b = new StringBuilder();
+
+            b.Append(string.Join(", ", Antecedents));
+            b.Append(" => ");
+            b.Append(string.Join(", ", Consequents));
+            b.Append($" -- Confidence={Confidence:0.0}, Support={Support:0.0000}");
+
+            return b.ToString();
+        }
     }
 }
