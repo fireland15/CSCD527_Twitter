@@ -59,6 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Apriori.Test.cs" />
+    <Compile Include="AssociateRules.Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -14,13 +14,13 @@ namespace HashtagGenerator.Interfaces
         
         IList<IOrderedEnumerable<string>> UnionSets(IList<IOrderedEnumerable<string>> itemSet, int maxTupleLength);
 
-        List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules);
+        List<AssociationRule> GenerateAssociationRules(string[] words);
 
-        IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words, int minSupport);
+        IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words);
 
-        List<string> CalculateAssociationRulesFor3ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total);
+        List<AssociationRule> CalculateAssociationRulesFor3ItemSets(List<string> itemList, int total);
 
-        List<string> CalculateAssociationRulesFor2ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total);
+        List<AssociationRule> CalculateAssociationRulesFor2ItemSets(List<string> itemList, int total);
     }
 
 }

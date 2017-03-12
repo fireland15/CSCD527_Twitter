@@ -19,59 +19,27 @@ namespace HashBrownConsole
 
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {                
-                IAprioriRepository repo = new AprioriRepository(con);
+                IAprioriRepository repo = new CachedAprioriRepository(con);
 
-				var Apriori = new Apriori(repo);
-                var tweet = new string[] {"potato"};
-                var stuff = Apriori.GenerateAssociationRules(tweet, 3, .1, .1);
-                Console.Write(stuff);
+                var options = new AprioriOptions
+                {
+                    MaximumTwoItemResults = 20,
+                    ItemSetMinimumSupport = 5,
+                    RuleMinimumConfidence = 0.1,
+                    RuleMinimumSupport = 0.1
+                };
 
-//
-//                // Test get all two item sets
-//                var twoItemSets = repo.GetAll2ItemSets(new List<string>
-//                {
-//                    "trump",
-//                    "wall",
-//                    "potus"
-//                });
-//
-//                foreach (var twoItemSet in twoItemSets)
-//                {
-//                    var listOfWords = twoItemSet.ToList();
-//                    foreach (var word in listOfWords)
-//                    {
-//                        Console.Write(word);
-//                        Console.Write(" ");
-//                    }
-//
-//                    Console.WriteLine();
-//                }
-//
-//                // Test getting count of a specific word
-//                int bananaCount = repo.GetCountSingle("banana");
-//                Console.WriteLine(bananaCount);
-//
-//                // Test getting count of a two words only
-//                int trumpWallCount = repo.GetCountDouble("wall", "trump");
-//                Console.WriteLine(trumpWallCount);
-//
-//                // Test getting count of three words only
-//                int trumpWallCountPotus = repo.GetCountTriple("wall", "trump", "banana");
-//                Console.WriteLine(trumpWallCountPotus);
-//
-//                // Test getting count of three words only
-//                int tweetCount = repo.GetTotal();
-//                Console.WriteLine(tweetCount);
-//                
-//
-//                INaiveRepository naiveRepo = new NaiveRepository(con);
-//                Naive naive = new Naive(naiveRepo);
-//
-//                var hashtags = naive.getHashtags(new string[] { "trump" }, 20);
-//                foreach (var tag in hashtags)
-//                {
-//                    Console.WriteLine(tag);
-//                }
+				var Apriori = new Apriori(repo, options);
+
+                var tweets = new List<IEnumerable<string>>();
+                tweets.Add(new List<string>
+                {
+                    "women",
+                    "awards"
+                });
+
+                var testRunner = new TestTweets(tweets, Apriori);
+                testRunner.RunTests();
             }
         }
     }

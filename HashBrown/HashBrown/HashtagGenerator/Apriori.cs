@@ -9,20 +9,31 @@ using Shared.Interfaces;
 
 namespace HashtagGenerator
 {
+    public class AprioriOptions
+    {
+        public int ItemSetMinimumSupport { get; set; }
+        public double RuleMinimumSupport { get; set; }
+        public double RuleMinimumConfidence { get; set; }
+        public int MaximumTwoItemResults { get; set; }
+    }
+
     public class Apriori : IApriori
     {
         private IAprioriRepository _repository { get; }
 
-        public Apriori(IAprioriRepository repo)
+        private readonly AprioriOptions _options;
+
+        public Apriori(IAprioriRepository repo, AprioriOptions options)
         {
             _repository = repo;
+            _options = options;
         }
 
         public string[] CreateHashtagsApriori(string text, int minSupport)
         {
             var words = ProcessUserGeneratedText(text);
 
-            GenerateAssociationRules(words, 3, 1, 1);
+            GenerateAssociationRules(words);
 
             return null;
         }
@@ -54,12 +65,12 @@ namespace HashtagGenerator
             return list ;
         }
 
-        public List<string> GenerateAssociationRules(string[] words, int minSupportFrequentItems, double minSupportRules, double minConfidenceRules)
+        public List<AssociationRule> GenerateAssociationRules(string[] words)
         {
 
-            var frequentItemSets = GenerateFrequentItemSets(words, minSupportFrequentItems);
+            var frequentItemSets = GenerateFrequentItemSets(words);
 
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
 
             var total = 50;//_repository.GetTotal();
 
@@ -70,33 +81,29 @@ namespace HashtagGenerator
                 {
                     //2 n itemsets
                     case 1:
-                        Console.Write(itemList[0] + "\n");
-                        associationRulesList.AddRange(CalculateAssociationRulesFor2ItemSets(itemList, minSupportRules, minConfidenceRules, total));
+                        associationRulesList.AddRange(CalculateAssociationRulesFor2ItemSets(itemList, total));
                         break;
 
                     //3 n itemsets
                     case 2:
-                        associationRulesList.AddRange(CalculateAssociationRulesFor3ItemSets(itemList, minSupportRules, minConfidenceRules, total));
+                        associationRulesList.AddRange(CalculateAssociationRulesFor3ItemSets(itemList, total));
                         break;
                 }
             }
             return associationRulesList;
         }
-
-        //called once for each itemset generated
-        // 2 calls to getcountsingle
-        // 1 call to getcountdouble
-        public List<string> CalculateAssociationRulesFor2ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total)
+        
+        public List<AssociationRule> CalculateAssociationRulesFor2ItemSets(List<string> itemList, int total)
         {
 
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
             int numOfTotalSet = _repository.GetCountDouble(itemList[0], itemList[1]); //database.get(AB)
 
             //calculate support
 
             var support = (double)numOfTotalSet / total; 
 
-            if (support < minSupportRules) //no need to continue, it doesnt meet support threshold
+            if (support < _options.RuleMinimumSupport) //no need to continue, it doesnt meet support threshold
             {
                 return associationRulesList;
             }
@@ -104,38 +111,61 @@ namespace HashtagGenerator
 
             //calculate confidence that A->B
             var confidenceAB = (double)numOfTotalSet / _repository.GetCountSingle(itemList[0]); //database.get(A)
-            if (confidenceAB >= minConfidenceRules)
+            if (confidenceAB >= _options.RuleMinimumConfidence)
             {
                 //add the A->B to the ruleSet
-                associationRulesList.Add(itemList[0] + " => " + itemList[1]);
+                //associationRulesList.Add(itemList[0] + " => " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Confidence = confidenceAB,
+                    Support = support
+                });
             }
 
             //calculate confidence that B->A
             var confidenceBA = (double)numOfTotalSet / _repository.GetCountSingle(itemList[1]); //database.get(B)
-            if (confidenceBA >= minConfidenceRules)
+            if (confidenceBA >= _options.RuleMinimumConfidence)
             {
                 //add the B -> A to the ruleSet
-                associationRulesList.Add(itemList[1] + " => " + itemList[0]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Confidence = confidenceAB,
+                    Support = support
+                });
             }
 
             return associationRulesList;
         }
-
-        //called once per itemset generated
-        // 1 call to get count triple
-        // 3 calls to get count single
-        // 3 calls to get count double
-        public List<string> CalculateAssociationRulesFor3ItemSets(List<string> itemList, double minSupportRules, double minConfidenceRules, int total)
+        
+        public List<AssociationRule> CalculateAssociationRulesFor3ItemSets(List<string> itemList, int total)
         {
-            var associationRulesList = new List<string>();
+            var associationRulesList = new List<AssociationRule>();
             var numOfTotalSet = _repository.GetCountTriple(itemList[0], itemList[1], itemList[2]); //database.get(ABC)
 
             //calculate support
 
             var support = (double)numOfTotalSet / total;
 
-            if (support > minSupportRules) //no need to continue, it doesnt meet support threshold
-            { return associationRulesList; }
+            if (support > _options.RuleMinimumSupport) //no need to continue, it doesnt meet support threshold
+            {
+                return associationRulesList;
+            }
 
 
             //calculate confidence that A->BC
@@ -156,47 +186,125 @@ namespace HashtagGenerator
             //calculate confidence that AC->B
             var confidenceACiB = (double)numOfTotalSet / _repository.GetCountDouble(itemList[0], itemList[2]); //database.get(AC)
 
-            if (confidenceAiBC >= minConfidenceRules)
+            if (confidenceAiBC >= _options.RuleMinimumConfidence)
             {
                 //add the A->BC to the ruleSet
-                associationRulesList.Add(itemList[0] + " => " + itemList[1] + " " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1],
+                        itemList[2]
+                    },
+                    Confidence = confidenceAiBC,
+                    Support = support
+                });
             }
-            if (confidenceBiAC >= minConfidenceRules)
+            if (confidenceBiAC >= _options.RuleMinimumConfidence)
             {
                 //add the B->AC to the ruleSet
-                associationRulesList.Add(itemList[1] + " => " + itemList[0] + " " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[2]
+                    },
+                    Confidence = confidenceBiAC,
+                    Support = support
+                });
             }
-            if (confidenceCiAB >= minConfidenceRules)
+            if (confidenceCiAB >= _options.RuleMinimumConfidence)
             {
                 //add the C->AB to the ruleSet
-                associationRulesList.Add(itemList[2] + " => " + itemList[0] + " " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[1]
+                    },
+                    Confidence = confidenceCiAB,
+                    Support = support
+                });
             }
-            if (confidenceABiC >= minConfidenceRules)
+            if (confidenceABiC >= _options.RuleMinimumConfidence)
             {
                 //add the AB->C to the ruleSet
-                associationRulesList.Add(itemList[0] + " " + itemList[1] + " => " + itemList[2]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[1]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[2]
+                    },
+                    Confidence = confidenceABiC,
+                    Support = support
+                });
             }
-            if (confidenceBCiA >= minConfidenceRules)
+            if (confidenceBCiA >= _options.RuleMinimumConfidence)
             {
                 //add the BC->A to the ruleSet
-                associationRulesList.Add(itemList[1] + " " + itemList[2] + " => " + itemList[0]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[1],
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[0]
+                    },
+                    Confidence = confidenceBCiA,
+                    Support = support
+                });
             }
-            if (confidenceACiB >= minConfidenceRules)
+            if (confidenceACiB >= _options.RuleMinimumConfidence)
             {
                 //add the AC->B to the ruleSet
-                associationRulesList.Add(itemList[1] + " " + itemList[2] + " => " + itemList[1]);
+                associationRulesList.Add(new AssociationRule
+                {
+                    Antecedents = new List<string>
+                    {
+                        itemList[0],
+                        itemList[2]
+                    },
+                    Consequents = new List<string>
+                    {
+                        itemList[1]
+                    },
+                    Confidence = confidenceACiB,
+                    Support = support
+                });
             }
             return associationRulesList;
         }
 
         //one call
-        public IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words, int minSupport)
+        public IEnumerable<IOrderedEnumerable<string>> GenerateFrequentItemSets(string[] words)
         {
             IList<string> frequentItemsL1 = new List<string>();
             foreach (var word in words)
             {
                 var count = _repository.GetCountSingle(word); // PipeLineRepository.GetCount(word);
-                if (count >= minSupport)
+                if (count >= _options.ItemSetMinimumSupport)
                 {
                     frequentItemsL1.Add(word);
                 }
@@ -206,24 +314,9 @@ namespace HashtagGenerator
             {
                 throw new System.ArgumentException("Tweet is not popular enough for Apriori Analysis");
             }
-            
-            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, minSupport, 20);
-
-            if (frequentItemsL2.Count == 0)
-            {
-                throw new System.ArgumentException("Tweet is not popular enough for Apriori Analysis");
-            }
-//            var frequentItemsL2 = new List<IOrderedEnumerable<string>>();
-//            foreach (var wordset in candidatePairs)
-//            {
-//                var count = _repository.GetCountDouble(wordset.ToList()[0], wordset.ToList()[1]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 2 n wordsets
-//                   Console.Write(count);
-//                if (count >= minSupport)
-//                {
-//                    frequentItemsL2.Add(wordset);
-//                }
-//            }
-
+           
+            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, _options.ItemSetMinimumSupport, _options.MaximumTwoItemResults)
+                .OrderByDescending(x => _repository.GetCountDouble(x.First(), x.Last())).ToList();
             var candidateTriples = UnionSets(frequentItemsL2, 3);
             var frequentItemsL3 = _repository
                 .GetCountTripleMany(candidateTriples)
@@ -233,15 +326,7 @@ namespace HashtagGenerator
                     x.Item2,
                     x.Item3
                 }.OrderBy(y => y));
-
-            //foreach (var wordset in candidateTriples)
-            //{
-            //    var count = _repository.GetCountTriple(wordset.ToList()[0], wordset.ToList()[1], wordset.ToList()[2]); // PipeLineRepository.GetCount(wordset.First()); //whatever method to search 3 n word sets
-            //    if (count >= minSupport)
-            //    {
-            //        frequentItemsL3.Add(wordset);
-            //    }
-            //}
+            
             return frequentItemsL2.Union(frequentItemsL3);
         }
     }

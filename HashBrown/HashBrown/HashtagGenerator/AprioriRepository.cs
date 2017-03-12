@@ -29,8 +29,6 @@ namespace HashtagGenerator
 
             string sql = BuildTwoItemSetQuery(words.Count);
 
-            Console.WriteLine(sql);
-
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
                 using (NpgsqlCommand command = _connection.CreateCommand())
@@ -81,8 +79,6 @@ namespace HashtagGenerator
 
             string sql = BuildTwoItemSetQueryWithCount(words.Count);
 
-            Console.WriteLine(sql);
-
             using (NpgsqlTransaction transaction = _connection.BeginTransaction())
             {
                 using (NpgsqlCommand command = _connection.CreateCommand())
@@ -129,8 +125,6 @@ namespace HashtagGenerator
             int count = threeItemSets.Count();
 
             string sql = BuildTripleQuery(threeItemSets.Count());
-
-            Console.WriteLine(sql);
 
             List<Tuple<string, string, string, int>> results = new List<Tuple<string, string, string, int>>();
 
