@@ -23,7 +23,7 @@ namespace HashBrownConsole
 
                 var options = new AprioriOptions
                 {
-                    MaximumTwoItemResults = 50,
+                    MaximumTwoItemResults = 20,
                     ItemSetMinimumSupport = 5,
                     RuleMinimumConfidence = 0.1,
                     RuleMinimumSupport = 0.1

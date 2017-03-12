@@ -310,7 +310,8 @@ namespace HashtagGenerator
                 }
             }
             
-            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, _options.ItemSetMinimumSupport, _options.MaximumTwoItemResults);
+            var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, _options.ItemSetMinimumSupport, _options.MaximumTwoItemResults)
+                .OrderByDescending(x => _repository.GetCountDouble(x.First(), x.Last())).ToList();
 
             var candidateTriples = UnionSets(frequentItemsL2, 3);
             var frequentItemsL3 = _repository
