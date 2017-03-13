@@ -313,7 +313,10 @@ namespace HashtagGenerator
             var frequentItemsL2 = _repository.GetAll2ItemSets(frequentItemsL1, _options.ItemSetMinimumSupport, _options.MaximumTwoItemResults)
                 .OrderByDescending(x => _repository.GetCountDouble(x.First(), x.Last())).ToList();
 
-            var candidateTriples = UnionSets(frequentItemsL2, 3);
+            var candidateTriples = UnionSets(frequentItemsL2, 3).Where(x => x.Count() == 3).Where(x => x.Intersect(words).Count() >= 1);
+
+
+
             var frequentItemsL3 = _repository
                 .GetCountTripleMany(candidateTriples)
                 .Select(x => new List<string>

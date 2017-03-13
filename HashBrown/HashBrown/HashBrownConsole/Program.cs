@@ -8,6 +8,7 @@ using Npgsql;
 using System.Configuration;
 using Shared.Interfaces;
 using NaiveHashtag;
+using System.IO;
 
 namespace HashBrownConsole
 {
@@ -16,10 +17,38 @@ namespace HashBrownConsole
         static void Main(string[] args)
         {
             string connectionString = ConfigurationManager.AppSettings["connectionString"].ToString();
+            string pathToTestTweets = ConfigurationManager.AppSettings["pathToTestTweets"].ToString();
 
+            var tweets = ReadTestTweets(pathToTestTweets);
+
+            TestApriori(connectionString, tweets);
+
+            TestNaive(connectionString, tweets);
+        }
+
+        static IEnumerable<IEnumerable<string>> ReadTestTweets(string path)
+        {
+            var tweets = new List<IEnumerable<string>>();
+
+            using (StreamReader sr = new StreamReader(path))
+            {
+                string line;
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    var words = line.Split(' ');
+                    tweets.Add(words);
+                }
+            }
+
+            return tweets;
+        }
+
+        static void TestApriori(string connectionString, IEnumerable<IEnumerable<string>> tweets)
+        {
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
-            {                
-                IAprioriRepository repo = new CachedAprioriRepository(con);
+            {
+                CachedAprioriRepository repo = new CachedAprioriRepository(con);
 
                 var options = new AprioriOptions
                 {
@@ -29,16 +58,18 @@ namespace HashBrownConsole
                     RuleMinimumSupport = 0.1
                 };
 
-				var Apriori = new Apriori(repo, options);
+                var testRunner = new TestTweets(tweets, options, repo);
+                testRunner.RunTests();
+            }
+        }
 
-                var tweets = new List<IEnumerable<string>>();
-                tweets.Add(new List<string>
-                {
-                    "women",
-                    "awards"
-                });
+        static void TestNaive(string connectionString, IEnumerable<IEnumerable<string>> tweets)
+        {
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                NaiveRepository repo = new NaiveRepository(con);
 
-                var testRunner = new TestTweets(tweets, Apriori);
+                var testRunner = new TestNaive(tweets, repo);
                 testRunner.RunTests();
             }
         }

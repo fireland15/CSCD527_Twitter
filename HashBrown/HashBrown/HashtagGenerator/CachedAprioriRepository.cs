@@ -139,5 +139,12 @@ namespace HashtagGenerator
         {
             return _repo.GetTotal();
         }
+
+        public void ClearCache()
+        {
+            _singleWordCounts.Clear();
+            _doubleWordCounts.Clear();
+            _tripleWordCounts.Clear();
+        }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using HashtagGenerator;
-using HashtagGenerator.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HashBrownConsole
 {
@@ -15,10 +12,13 @@ namespace HashBrownConsole
 
         private readonly Apriori _apriori;
 
-        public TestTweets(IEnumerable<IEnumerable<string>> tweets, Apriori apriori)
+        private readonly CachedAprioriRepository _repo;
+
+        public TestTweets(IEnumerable<IEnumerable<string>> tweets, AprioriOptions options, CachedAprioriRepository repo)
         {
             _tweets = tweets;
-            _apriori = apriori;
+            _repo = repo;
+            _apriori = new Apriori(repo, options);
         }
 
         public void RunTests()
@@ -27,10 +27,11 @@ namespace HashBrownConsole
 
             foreach (var tweet in _tweets)
             {
-                using (StreamWriter sw = new StreamWriter($"tweet_{count++}_result.txt"))
+                using (StreamWriter sw = new StreamWriter($"apriori_tweet_{count++}.txt"))
                 {
                     IEnumerable<AssociationRule> associationRules;
 
+                    _repo.ClearCache();
                     double time = RunApriori(tweet, out associationRules);
 
                     sw.WriteLine($"Completed in {time} seconds");

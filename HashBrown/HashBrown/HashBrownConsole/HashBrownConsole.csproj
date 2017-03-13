@@ -136,6 +136,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestNaive.cs" />
     <Compile Include="TestTweets.cs" />
   </ItemGroup>
   <ItemGroup>
